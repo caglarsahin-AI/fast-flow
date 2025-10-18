@@ -1,0 +1,401 @@
+source_db_var: "ocean"
+target_db_var: "ocean_dwh"
+
+etl_tasks:
+  ################################################################### target_table:  "crd_card"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table:  "crd_card"
+    target_schema: "dwh_ods"
+    target_table:  "crd_card"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""         # push-down filtre (opsiyonel)
+    order_by: ""      # push-down sıralama (opsiyonel)
+
+    passthrough_full: false
+    passthrough_format: "binary"        # sadece bilgi amaçlı; kod binary kullanıyor
+    passthrough_spool_max_mb: 2048      # büyük batch'ler için buffer eşiği
+    batch_size: 40000
+
+    partitioning:
+      enabled: true
+      column: "mbr_id"  
+      mode: "auto"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      parts: 8           # hash_mod/auto/percentile için  (max işlemci sayıs kadar )
+
+
+    ################################################################### target_table:  "crd_account"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table:  "crd_account"
+    target_schema: "dwh_ods"
+    target_table:  "crd_account"
+    load_method: "drop_if_exists_and_create" #"truncate_table" #"create_if_not_exists_or_truncate" #     load_method: "full_stream"
+
+    # isteğe bağlı global filtre/sıralama
+    where: ""                 # örn: status = 1 AND last_updated >= 20250101
+    order_by: ""              # örn: last_updated ASC, guid
+
+    # (opsiyonel) streaming ayarları 
+    use_stream: false
+    #batch_size: 40000    # partition kullanıldığında gerek olmayabilir
+    #commit_every: 120000 # partition kullanıldığında gerek olmayabilir
+    
+    # FULL STREAM PASSTHROUGH
+    passthrough_full: true
+    passthrough_format: "binary"      # "csv" veya "binary"
+    passthrough_spool_max_mb: 2048    # edge-case büyük batch’lerde buffer
+    batch_size: 40000 
+    
+    # Partition stratejisi (seçeneklerden biri):
+    partitioning:
+      enabled: false
+    #   column: "mbr_id"  
+    #   mode: "percentile"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+    #   parts: 2           # hash/auto/percentile için  (max işlemci sayıs kadar )
+
+    # Alternatif:
+    # partitioning:
+    #   enabled: true
+    #   column: "customer_no"
+    #   mode: "explicit"
+    #   parts: 4
+    #   min: 0
+    #   max: 99999999
+
+  ################################################################### crd_account_limit
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table:  "crd_account_limit"
+    target_schema: "dwh_ods"
+    target_table:  "crd_account_limit"
+    load_method: "create_if_not_exists_or_truncate" #"truncate_table" #"create_if_not_exists_or_truncate" #     load_method: "full_stream"
+
+    # isteğe bağlı global filtre/sıralama
+    where: ""                 # örn: status = 1 AND last_updated >= 20250101
+    order_by: ""              # örn: last_updated ASC, guid
+
+    # (opsiyonel) streaming ayarları 
+    use_stream: false
+    #batch_size: 100000    # partition kullanıldığında gerek olmayabilir
+    #commit_every: 120000 # partition kullanıldığında gerek olmayabilir
+    
+    # FULL STREAM PASSTHROUGH
+    passthrough_full: false
+    passthrough_format: "binary"      # "csv" veya "binary"
+    passthrough_spool_max_mb: 2048   # edge-case büyük batch’lerde buffer
+    batch_size: 100000
+    
+    # Partition stratejisi (seçeneklerden biri):
+    partitioning:
+      enabled: true
+      column: "guid"  
+      mode: "percentile"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      parts: 2           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      #distinct_limit: 16  # distinct e açırı yüklemeleri engeller 
+
+    # Alternatif:
+    # partitioning:
+    #   enabled: true
+    #   column: "customer_no"
+    #   mode: "explicit"
+    #   parts: 4
+    #   min: 0
+    #   max: 99999999
+
+
+  #  - source_schema: "ocn_cat"
+  #    source_table: "cat_acquirer_def"
+  #    target_schema: "ocn_cat"
+  #    target_table: "cat_acquirer_def"
+  #    load_method: "create_if_not_exists_or_truncate"
+
+
+  ################################################################### target_table: "cmp_install_txn_order"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cmp_install_txn_order"
+    target_schema: "dwh_ods"
+    target_table: "cmp_install_txn_order"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_account_communication"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_account_communication"
+    target_schema: "dwh_ods"
+    target_table: "crd_account_communication"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_account_limit_ext"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_account_limit_ext"
+    target_schema: "dwh_ods"
+    target_table: "crd_account_limit_ext"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_account_limit_rest"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_account_limit_rest"
+    target_schema: "dwh_ods"
+    target_table: "crd_account_limit_rest"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_account_limit_rest_used"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_account_limit_rest_used"
+    target_schema: "dwh_ods"
+    target_table: "crd_account_limit_rest_used"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_account_limit_used"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_account_limit_used"
+    target_schema: "dwh_ods"
+    target_table: "crd_account_limit_used"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_account_point"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_account_point"
+    target_schema: "dwh_ods"
+    target_table: "crd_account_point"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_account_point_cmp"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_account_point_cmp"
+    target_schema: "dwh_ods"
+    target_table: "crd_account_point_cmp"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+
+    ################################################################### target_table: "crd_card_account"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_card_account"
+    target_schema: "dwh_ods"
+    target_table: "crd_card_account"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    batch_size: 100000
+    partitioning:
+      enabled: true
+      column: "mbr_id"  
+      mode: "auto"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      parts: 4           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      #distinct_limit: 16  # distinct e açırı yüklemeleri engeller 
+
+    ################################################################### target_table: "crd_card_account_balance"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_card_account_balance"
+    target_schema: "dwh_ods"
+    target_table: "crd_card_account_balance"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_card_auth"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_card_auth"
+    target_schema: "dwh_ods"
+    target_table: "crd_card_auth"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: true
+      column: "card_guid"  
+      mode: "auto"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      parts: 4           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      #distinct_limit: 16  # distinct e açırı yüklemeleri engeller 
+
+    ################################################################### target_table: "crd_card_batch_application"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_card_batch_application"
+    target_schema: "dwh_ods"
+    target_table: "crd_card_batch_application"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+
+
+    ################################################################### target_table: "crd_card_fee"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_card_fee"
+    target_schema: "dwh_ods"
+    target_table: "crd_card_fee"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_card_fee_trail"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_card_fee_trail"
+    target_schema: "dwh_ods"
+    target_table: "crd_card_fee_trail"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_card_last_activity"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_card_last_activity"
+    target_schema: "dwh_ods"
+    target_table: "crd_card_last_activity"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: true
+      column: "card_guid"  
+      mode: "auto"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      parts: 4           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      #distinct_limit: 16  # distinct e açırı yüklemeleri engeller 
+
+    ################################################################### target_table: "crd_card_level_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_card_level_def"
+    target_schema: "dwh_ods"
+    target_table: "crd_card_level_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_card_logo_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_card_logo_def"
+    target_schema: "dwh_ods"
+    target_table: "crd_card_logo_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false

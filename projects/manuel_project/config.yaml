@@ -1,0 +1,13 @@
+source_db_var: "daphne"
+target_db_var: "dwh"
+
+etl_tasks:
+  - source_schema: "ocn_cat_txn"
+    source_table: "cat_trnx_log_processing"
+    target_schema: "ocn_cat_txn"
+    target_table: "cat_trnx_log_processing"
+    load_method: "pagination_dates"
+    date_column: "system_date"
+    date_start: "20241101"
+    date_end: "20250201"
+    page_size: 30000

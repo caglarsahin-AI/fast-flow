@@ -1,0 +1,87 @@
+# Auto-generated mapping template
+# Adjust target names or add transform blocks as needed.
+version: '1.0'
+mapping_type: column
+generated_at: '2025-10-07T10:14:49Z'
+source:
+  schema: ocn_iss
+  table: crd_account_balance_used_hist
+columns:
+- source: guid
+  target: guid
+  type: NUMERIC(16, 0)
+- source: last_updated
+  target: last_updated
+  type: NUMERIC(16, 0)
+- source: txn_guid
+  target: txn_guid
+  type: NUMERIC(16, 0)
+- source: txn_def_guid
+  target: txn_def_guid
+  type: NUMERIC(16, 0)
+- source: account_no
+  target: account_no
+  type: VARCHAR(10)
+- source: currency_code
+  target: currency_code
+  type: NUMERIC(3, 0)
+- source: current_host_balance
+  target: current_host_balance
+  type: NUMERIC(17, 2)
+- source: new_host_balance
+  target: new_host_balance
+  type: NUMERIC(17, 2)
+- source: current_chip_balance
+  target: current_chip_balance
+  type: NUMERIC(17, 2)
+- source: new_chip_balance
+  target: new_chip_balance
+  type: NUMERIC(17, 2)
+- source: blocked_balance
+  target: blocked_balance
+  type: NUMERIC(17, 2)
+- source: transaction_amount
+  target: transaction_amount
+  type: NUMERIC(17, 2)
+- source: outstanding_amount
+  target: outstanding_amount
+  type: NUMERIC(17, 2)
+- source: is_minus_flag
+  target: is_minus_flag
+  type: NUMERIC(1, 0)
+- source: is_declined
+  target: is_declined
+  type: NUMERIC(1, 0)
+- source: directive_offline_amount
+  target: directive_offline_amount
+  type: NUMERIC(17, 2)
+- source: fix_amount
+  target: fix_amount
+  type: NUMERIC(17, 2)
+- source: queue_amount
+  target: queue_amount
+  type: NUMERIC(17, 2)
+- source: balance_detail
+  target: balance_detail
+  type: VARCHAR(4000)
+- source: chip_flags
+  target: chip_flags
+  type: VARCHAR(3)
+- source: inserter_type
+  target: inserter_type
+  type: VARCHAR(2)
+- source: insert_user
+  target: insert_user
+  type: VARCHAR(50)
+- source: insert_date
+  target: insert_date
+  type: NUMERIC(8, 0)
+- source: insert_time
+  target: insert_time
+  type: NUMERIC(9, 0)
+- source: txn_stt
+  target: txn_stt
+  type: VARCHAR(1)
+- source: cash_withdraw_block_amount
+  target: cash_withdraw_block_amount
+  type: NUMERIC(17, 2)

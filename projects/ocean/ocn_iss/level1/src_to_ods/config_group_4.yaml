@@ -1,0 +1,209 @@
+#config_group_4.yaml
+source_db_var: "ocean"
+target_db_var: "ocean_dwh"
+
+etl_tasks:
+
+    ################################################################### target_table: "txn_fee_det"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_fee_det"
+    target_schema: "dwh_ods"
+    target_table: "txn_fee_det"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "txn_fin_adj"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_fin_adj"
+    target_schema: "dwh_ods"
+    target_table: "txn_fin_adj"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+
+    ################################################################### target_table: "txn_install"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_install"
+    target_schema: "dwh_ods"
+    target_table: "txn_install"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "txn_install_onl"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_install_onl"
+    target_schema: "dwh_ods"
+    target_table: "txn_install_onl"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+
+
+    ################################################################### target_table: "txn_issuer_banking"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_issuer_banking"
+    target_schema: "dwh_ods"
+    target_table: "txn_issuer_banking"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "txn_issuer_ext"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_issuer_ext"
+    target_schema: "dwh_ods"
+    target_table: "txn_issuer_ext"
+    load_method: "drop_if_exists_and_create"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "txn_issuer_install"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_issuer_install"
+    target_schema: "dwh_ods"
+    target_table: "txn_issuer_install"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "txn_issuer_loyalty"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_issuer_loyalty"
+    target_schema: "dwh_ods"
+    target_table: "txn_issuer_loyalty"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+      
+
+    ################################################################### target_table: "txn_issuer_onl"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_issuer_onl"
+    target_schema: "dwh_ods"
+    target_table: "txn_issuer_onl"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+
+    passthrough_full: true
+    passthrough_format: "binary"        # sadece bilgi amaçlı; kod binary kullanıyor
+    passthrough_spool_max_mb: 2048      # büyük batch'ler için buffer eşiği
+    batch_size: 100000
+
+    partitioning:
+      enabled: false
+      column: "mbr_id"  
+      mode: "hash_mod"   # auto(en düşük ve en yüksek değeri part sayısına böyerek sorguları oluşturur) | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      parts: 8           # hash_mod/auto/percentile için  (max işlemci sayıs kadar )
+
+    ################################################################### target_table: "txn_issuer_profile_info"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_issuer_profile_info"
+    target_schema: "dwh_ods"
+    target_table: "txn_issuer_profile_info"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+
+
+    ################################################################### target_table: "txn_limit_restriction_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_limit_restriction_def"
+    target_schema: "dwh_ods"
+    target_table: "txn_limit_restriction_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "txn_limit_restriction_det"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_limit_restriction_det"
+    target_schema: "dwh_ods"
+    target_table: "txn_limit_restriction_det"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false

@@ -1,0 +1,27 @@
+# Auto-generated mapping template
+# Adjust target names or add transform blocks as needed.
+version: '1.0'
+mapping_type: column
+generated_at: '2025-10-08T12:10:10Z'
+source:
+  schema: ocn_iss
+  table: txn_issuer_security
+  sql: "SELECT \n    \"ocn_iss\".\"txn_issuer_security\".\"txn_guid\",\n    \"ocn_iss\"\
+    .\"txn_issuer_security\".\"cavv_ind\",\n    \"ocn_iss\".\"txn_issuer_security\"\
+    .\"cavv_data\",\n    \"ocn_iss\".\"txn_issuer_security\".\"security_level_indicator\"\
+    \nFROM \"ocn_iss\".\"txn_issuer_security\"\nWHERE EXISTS (\n    SELECT 1 \n  \
+    \  FROM ocn_iss.txn_issuer_onl tio\n    WHERE txn_issuer_security.txn_guid = tio.guid\n\
+    )"
+columns:
+- source: txn_guid
+  target: txn_guid
+  type: NUMERIC(16, 0)
+- source: cavv_ind
+  target: cavv_ind
+  type: NUMERIC(3, 0)
+- source: cavv_data
+  target: cavv_data
+  type: VARCHAR(48)
+- source: security_level_indicator
+  target: security_level_indicator
+  type: NUMERIC(3, 0)

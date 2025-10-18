@@ -1,0 +1,398 @@
+####  config_group_1.yaml
+source_db_var: "ocean"
+target_db_var: "ocean_dwh"
+
+etl_tasks:
+    ################################################################### target_table: "crd_account_balance_used_hist"
+  - task_group_id: crd_account_balance_used_hist
+    source_type: table
+    source_schema: "ocn_iss"
+    source_table: "crd_account_balance_used_hist"
+    target_schema: "dwh_stg"
+    target_table: "crd_account_balance_used_hist"
+    load_method: "create_if_not_exists_or_truncate"   #drop_and_create drop_if_exists_and_create   create_if_not_exists_or_truncate  create_if_not_exists
+    
+    column_mapping_mode: "mapping_file"  # source |  mapping_file   # source: kaynak tablo yapısı  # mapping_file: mapping dosyası kullan
+    mapping_file: /opt/airflow/projects/ocean/ocn_iss/level1/src_to_stg/crd_account_balance_used_hist/mapping.yaml
+    #sql_file: /opt/airflow/projects/ocean/ocn_iss/level1/src_to_stg/crd_account_balance_used_hist/sql.sql
+    where: >
+        insert_date < to_number(to_char(current_date,'YYYYMMDD'),'99999999')
+        AND insert_date >= :dwh_last_insert_date
+    bindings:
+      dwh_last_insert_date:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          SELECT COALESCE(MAX(insert_date), 19000101)
+          FROM ocn_iss.crd_account_balance_used_hist
+        default: 19000101
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 1024
+    batch_size: 100_000
+    
+    partitioning:
+      enabled: true
+      column: insert_date
+      mode: "distinct"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      #parts: 4           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      distinct_limit: 16  # distinct e aşırı yüklemeleri engeller 
+
+    ################################################################### target_table: "txn_issuer_security_1"
+  - task_group_id: txn_issuer_security_1
+    source_type: sql
+    #source_table: "crd_account_balance_used_hist"
+    target_schema: "dwh_stg"
+    target_table: "txn_issuer_security_temp_1"
+    load_method: "drop_if_exists_and_create"   #drop_if_exists_and_create
+    
+    column_mapping_mode: "mapping_file"  # source |  mapping_file   # source: kaynak tablo yapısı  # mapping_file: mapping dosyası kullan
+    mapping_file: /opt/airflow/projects/ocean/ocn_iss/level1/src_to_stg/txn_issuer_security_1/mapping.yaml
+    sql_file: /opt/airflow/projects/ocean/ocn_iss/level1/src_to_stg/txn_issuer_security_1/sql.sql
+
+    where: "" 
+    bindings: {}
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 1024
+    batch_size: 100_000
+    
+    partitioning:
+      enabled: true
+      column: insert_date
+      mode: "distinct"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      #parts: 4           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      distinct_limit: 16  # distinct e açırı yüklemeleri engeller 
+ 
+    ################################################################### target_table: "txn_issuer_security_2"
+  - task_group_id: txn_issuer_security_2
+    source_type: sql
+    #source_table: "crd_account_balance_used_hist"
+    target_schema: "dwh_stg"
+    target_table: "txn_issuer_security_temp_2"
+    load_method: "drop_if_exists_and_create"   #drop_if_exists_and_create
+    
+    column_mapping_mode: "mapping_file"  # source |  mapping_file   # source: kaynak tablo yapısı  # mapping_file: mapping dosyası kullan
+    mapping_file: /opt/airflow/projects/ocean/ocn_iss/level1/src_to_stg/txn_issuer_security_2/mapping.yaml
+    sql_file: /opt/airflow/projects/ocean/ocn_iss/level1/src_to_stg/txn_issuer_security_2/sql.sql
+    where: "" 
+    bindings: {}
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 1024
+    batch_size: 100_000
+    
+    partitioning:
+      enabled: true
+      column: insert_date
+      mode: "distinct"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      #parts: 4           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      distinct_limit: 16  # distinct e açırı yüklemeleri engeller 
+
+
+    ################################################################### target_table: "txn_issuer_security_3"
+  - task_group_id: txn_issuer_security_3
+    source_type: sql
+    #source_table: "crd_account_balance_used_hist"
+    target_schema: "dwh_stg"
+    target_table: "txn_issuer_security_temp_3"
+    load_method: "drop_if_exists_and_create"   #drop_if_exists_and_create
+    
+    column_mapping_mode: "mapping_file"  # source |  mapping_file   # source: kaynak tablo yapısı  # mapping_file: mapping dosyası kullan
+    mapping_file: /opt/airflow/projects/ocean/ocn_iss/level1/src_to_stg/txn_issuer_security_3/mapping.yaml
+    sql_file: /opt/airflow/projects/ocean/ocn_iss/level1/src_to_stg/txn_issuer_security_3/sql.sql
+
+    where: "" 
+    bindings: {}
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 1024
+    batch_size: 100_000
+    
+    partitioning:
+      enabled: true
+      column: "insert_date"  
+      mode: "distinct"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      #parts: 4           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      distinct_limit: 16  # distinct e açırı yüklemeleri engeller 
+
+
+    ################################################################### target_table: "crd_card_delivery"
+  - task_group_id: crd_card_delivery
+    source_type: table
+    source_schema: "ocn_iss"
+    source_table: "crd_card_delivery"
+    target_schema: "dwh_stg"
+    target_table: "crd_card_delivery"
+    load_method: "create_if_not_exists_or_truncate"
+
+    column_mapping_mode: "source"  # source
+
+    where: "last_updated = 1 or last_updated >= to_number(to_char(current_date-1,'YYYYMMDD'),'99999999')*100000000"
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    # Partition stratejisi (seçeneklerden biri):
+    # partitioning:
+    #   enabled: false
+    #   column: "mbr_id"  
+    #   mode: "percentile"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+    #   parts: 2           # hash/auto/percentile için  (max işlemci sayıs kadar )
+
+    # Alternatif:
+    # partitioning:
+    #   enabled: true
+    #   column: "customer_no"
+    #   mode: "explicit"
+    #   parts: 4
+    #   min: 0
+    #   max: 99999999
+
+
+  #  - source_schema: "ocn_cat"
+  #    source_table: "cat_acquirer_def"
+  #    target_schema: "ocn_cat"
+  #    target_table: "cat_acquirer_def"
+  #    load_method: "create_if_not_exists_or_truncate"
+
+
+
+    ################################################################### target_table: "crd_courier_feedback"
+  - task_group_id: crd_courier_feedback
+    source_type: table
+    source_schema: "ocn_iss"
+    source_table: "crd_courier_feedback"
+    target_schema: "dwh_stg"
+    target_table: "crd_courier_feedback"
+    load_method: "create_if_not_exists_or_truncate"
+
+    column_mapping_mode: "source"  # source
+
+    where: >
+       process_date >= :dwh_aktarim_baslangic
+        AND process_date < to_number(to_char(current_date,'yyyymmdd'),'99999999')
+    bindings:
+      dwh_aktarim_baslangic:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(to_date(max(substr(process_date::text,1,8))::text,'yyyymmdd')-2,'YYYYMMDD')::integer aktarima_alinacak_tarihi
+          from ocn_iss.crd_courier_feedback
+        default: 19000101
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 1024
+    batch_size: 100000
+
+    partitioning:
+      enabled: false
+
+
+    ################################################################### target_table: "crd_stoplist_info"
+  - task_group_id: crd_stoplist_info
+    source_type: table
+    source_schema: "ocn_iss"
+    source_table: "crd_stoplist_info"
+    target_schema: "dwh_stg"
+    target_table: "crd_stoplist_info"
+    load_method: "create_if_not_exists_or_truncate"
+
+    column_mapping_mode: "source"  # source
+
+    where: >
+      (notice_date is null and insert_date_time is null) 
+      or ((notice_date >= :dwh_aktarim_baslangic_tar) 
+            and (notice_date <= :dwh_aktarim_bitis_tar)) 
+      or ((insert_date_time >= to_number(:dwh_aktarim_baslangic_tar || '00000000','9999999999999999') ) 
+          and (insert_date_time <= to_number(:dwh_aktarim_bitis_tar|| '00000000','9999999999999999') ))
+    bindings:
+      dwh_aktarim_baslangic_tar:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(
+            to_date(
+              max(coalesce(substr(notice_date::text,1,8), substr(insert_date_time::text,1,8)))::text,'yyyymmdd')-1,'YYYYMMDD') aktarima_alinacak_tarihi
+          from ocn_iss.crd_stoplist_info
+      dwh_aktarim_bitis_tar:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(current_date,'YYYYMMDD')::integer
+        default: 19000101
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 1024
+    batch_size: 100000
+
+    partitioning:
+      enabled: false
+
+
+    ################################################################### target_table: "txn_cycle"
+  - task_group_id: txn_cycle
+    source_type: table
+    source_schema: "ocn_iss"
+    source_table: "txn_cycle"
+    target_schema: "dwh_stg"
+    target_table: "txn_cycle"
+    load_method: "create_if_not_exists_or_truncate"
+
+    column_mapping_mode: "source"  # source
+
+    where: >
+      (eod_date between :dwh_aktarim_baslangic_tar AND :dwh_aktarim_bitis_tar
+        or stmt_date between :dwh_aktarim_baslangic_tar AND :dwh_aktarim_bitis_tar
+      ) 
+      AND eod_date < :dwh_aktarim_bitis_tar
+    bindings:
+      dwh_aktarim_baslangic_tar:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(
+           to_date(max(eod_date)::text,'yyyymmdd')-1,'YYYYMMDD')::integer aktarima_alinacak_tarihi 
+           from ocn_iss.txn_cycle
+      dwh_aktarim_bitis_tar:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(current_date,'YYYYMMDD')::integer
+        default: 19000101
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 1024
+    batch_size: 100000
+
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "txn_info_issuer"
+  - task_group_id: txn_info_issuer
+    source_type: table
+    source_schema: "ocn_iss"
+    source_table: "txn_info_issuer"
+    target_schema: "dwh_stg"
+    target_table: "txn_info_issuer"
+    load_method: "create_if_not_exists_or_truncate"
+
+    column_mapping_mode: "source"  # source
+
+    where: >
+      eod_date >= :dwh_aktarim_baslangic_tar
+        AND eod_date <= :dwh_aktarim_bitis_tar
+    bindings:
+      dwh_aktarim_baslangic_tar:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(to_date(max(eod_date)::text,'yyyymmdd')-2,'YYYYMMDD')::integer aktarima_alinacak_tarihi 
+          from ocn_iss.txn_info_issuer
+      dwh_aktarim_bitis_tar:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(current_date,'YYYYMMDD')::integer
+        default: 19000101
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 1024
+    batch_size: 100000
+
+    partitioning:
+      enabled: false
+
+
+
+    ################################################################### target_table: "txn_issuer"
+  - task_group_id: txn_issuer
+    source_type: table
+    source_schema: "ocn_iss"
+    source_table: "txn_issuer"
+    target_schema: "dwh_stg"
+    target_table: "txn_issuer"
+    load_method: "create_if_not_exists_or_truncate"
+
+    column_mapping_mode: "source"  # source
+
+    where: >
+      eod_date >= :dwh_aktarim_baslangic_tar
+      and eod_date <=  :dwh_aktarim_bitis_tar
+    bindings:
+      dwh_aktarim_baslangic_tar:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(to_date(max(eod_date)::text,'yyyymmdd')-2,'YYYYMMDD')::integer aktarima_alinacak_tarihi 
+          from ocn_iss.txn_issuer
+      dwh_aktarim_bitis_tar:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(current_date,'YYYYMMDD')::integer
+        default: 19000101
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 1024
+    batch_size: 100000
+
+    partitioning:
+      enabled: false
+
+
+
+    ################################################################### target_table: "txn_issuer_expire"
+  - task_group_id: txn_issuer_expire
+    source_type: table
+    source_schema: "ocn_iss"
+    source_table: "txn_issuer_expire"
+    target_schema: "dwh_stg"
+    target_table: "txn_issuer_expire"
+    load_method: "create_if_not_exists_or_truncate"
+
+    column_mapping_mode: "source"  # source
+
+    where: >
+      eod_date >= :dwh_aktarim_baslangic_tar
+      and eod_date <=  :dwh_aktarim_bitis_tar
+    bindings:
+      dwh_aktarim_baslangic_tar:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(to_date(max(eod_date)::text,'yyyymmdd')-2,'YYYYMMDD')::integer aktarima_alinacak_tarihi 
+          from ocn_iss.txn_issuer_expire
+      dwh_aktarim_bitis_tar:
+        from: target              # target | # source | # airflow_var (dwh_last_insert_date value in airflow variable)
+        sql: |
+          select to_char(current_date,'YYYYMMDD')::integer
+        default: 19000101
+    order_by: ""
+    passthrough_full: false
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 1024
+    batch_size: 100000
+
+    partitioning:
+      enabled: false
+
+
+  ################################################################### target_table: "txn_issuer_security"
+  ##   task_id burada olmalı ve alt klasor task_id ye göre oluşabilir, sql file vs o klasör altında toplanır
+  ##- source_schema: "ocn_iss"   source type table,SQL , text file, json, API gibi seçenekler olabilmeli
+  ##  source_table: "txn_issuer_security"
+  ##  target_schema: "dwh_stg"
+  ##  target_table: "txn_issuer_security"
+  ##  load_method: "create_if_not_exists_or_truncate" 
+
+  ##  where: ""
+  ##  order_by: ""
+  ##  passthrough_full: true
+  ##  passthrough_format: "binary"
+  ##  passthrough_spool_max_mb: 2048
+  ##  partitioning:
+  ##    enabled: false
+
+

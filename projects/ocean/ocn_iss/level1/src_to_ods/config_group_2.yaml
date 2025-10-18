@@ -1,0 +1,287 @@
+source_db_var: "ocean"
+target_db_var: "ocean_dwh"
+
+etl_tasks:
+    ################################################################### target_table: "crd_card_no_name"
+  - source_schema: "ocn_iss"
+    source_table: "crd_card_no_name"
+    target_schema: "dwh_ods"
+    target_table: "crd_card_no_name"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_courier"
+  - source_schema: "ocn_iss"
+    source_table: "crd_courier"
+    target_schema: "dwh_ods"
+    target_table: "crd_courier"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+
+
+    ################################################################### target_table: "crd_courier_message_def"
+  - source_schema: "ocn_iss"
+    source_table: "crd_courier_message_def"
+    target_schema: "dwh_ods"
+    target_table: "crd_courier_message_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_product"
+  - source_schema: "ocn_iss"
+    source_table: "crd_product"
+    target_schema: "dwh_ods"
+    target_table: "crd_product"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_profile_map"
+  - source_schema: "ocn_iss"
+    source_table: "crd_profile_map"
+    target_schema: "dwh_ods"
+    target_table: "crd_profile_map"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_profile_rel"
+  - source_schema: "ocn_iss"
+    source_table: "crd_profile_rel"
+    target_schema: "dwh_ods"
+    target_table: "crd_profile_rel"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_stat_def"
+  - source_schema: "ocn_iss"
+    source_table: "crd_stat_def"
+    target_schema: "dwh_ods"
+    target_table: "crd_stat_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "crd_stat_reason_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "crd_stat_reason_def"
+    target_schema: "dwh_ods"
+    target_table: "crd_stat_reason_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+
+    ################################################################### target_table: "cst_customer"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_account"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_account"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_account"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_address"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_address"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_address"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_address_type_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_address_type_def"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_address_type_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_comm_type_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_comm_type_def"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_comm_type_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_communication"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_communication"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_communication"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_disabled_type_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_disabled_type_def"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_disabled_type_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_graduation_type_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_graduation_type_def"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_graduation_type_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_group_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_group_def"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_group_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_identity"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_identity"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_identity"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false

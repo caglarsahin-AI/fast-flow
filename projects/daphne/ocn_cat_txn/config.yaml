@@ -1,0 +1,54 @@
+source_db_var: "daphne"
+target_db_var: "dwh"
+
+etl_tasks:
+  - source_schema: "ocn_cat_txn"
+    source_table: "cat_case_log"
+    target_schema: "ocn_cat_txn"
+    target_table: "cat_case_log"
+    load_method: "incremental_by_max_date"      
+    date_column: "system_date"             
+    dedupe_daily: false               
+    multiprocess: false
+
+  - source_schema: "ocn_cat_txn"
+    source_table: "cat_scenario_label_log"
+    target_schema: "ocn_cat_txn"
+    target_table: "cat_scenario_label_log"
+    load_method: "incremental_by_max_date"      
+    date_column: "system_date"             
+    dedupe_daily: false               
+    multiprocess: false
+
+  - source_schema: "ocn_cat_txn"
+    source_table: "cat_sms_mail_process_history"
+    target_schema: "ocn_cat_txn"
+    target_table: "cat_sms_mail_process_history"
+    load_method: "incremental_by_max_date"      
+    date_column: "system_date"             
+    dedupe_daily: false               
+    multiprocess: false
+  
+  - source_schema: "ocn_cat_txn"
+    source_table: "cat_trnx_log_processing"
+    target_schema: "ocn_cat_txn"
+    target_table: "cat_trnx_log_processing"
+    load_method: "incremental_by_max_date"
+    date_column: "system_date"
+    unique_key_column: "txn_guid"     # sıralanabilir tekil kolon (opsiyonel)
+    passthrough_copy: true             # ← hızlı yol
+    passthrough_spool_max_mb: 1024      # RAM limiti (default 256)
+    multiprocess: false
+    dedupe_daily: false  
+  
+  - source_schema: "ocn_cat_txn"
+    source_table: "cat_message_history"
+    target_schema: "ocn_cat_txn"
+    target_table: "cat_message_history"
+    load_method: "incremental_by_max_date"
+    date_column: "system_date"
+    unique_key_column: "trnx_guid"     # sıralanabilir tekil kolon (opsiyonel)
+    passthrough_copy: true             # ← hızlı yol
+    passthrough_spool_max_mb: 1024      # RAM limiti (default 256)
+    multiprocess: false
+    dedupe_daily: false  

@@ -1,0 +1,340 @@
+source_db_var: "ocean"
+target_db_var: "ocean_dwh"
+
+etl_tasks:
+
+    ################################################################### target_table: "cst_customer_profession_type_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_profession_type_def"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_profession_type_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_risk_group_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_risk_group_def"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_risk_group_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_customer_type_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_customer_type_def"
+    target_schema: "dwh_ods"
+    target_table: "cst_customer_type_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "cst_stat_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "cst_stat_def"
+    target_schema: "dwh_ods"
+    target_table: "cst_stat_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "dbt_bank_account"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "dbt_bank_account"
+    target_schema: "dwh_ods"
+    target_table: "dbt_bank_account"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "dbt_bank_account_type_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "dbt_bank_account_type_def"
+    target_schema: "dwh_ods"
+    target_table: "dbt_bank_account_type_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "emb_emboss_code_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "emb_emboss_code_def"
+    target_schema: "dwh_ods"
+    target_table: "emb_emboss_code_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "emb_request_history"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "emb_request_history"
+    target_schema: "dwh_ods"
+    target_table: "emb_request_history"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_account_stat"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_account_stat"
+    target_schema: "dwh_ods"
+    target_table: "stmt_account_stat"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_auto_payment"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_auto_payment"
+    target_schema: "dwh_ods"
+    target_table: "stmt_auto_payment"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_balance_detail"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_balance_detail"
+    target_schema: "dwh_ods"
+    target_table: "stmt_balance_detail"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_billing_cycle_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_billing_cycle_def"
+    target_schema: "dwh_ods"
+    target_table: "stmt_billing_cycle_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_bucket_sys_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_bucket_sys_def"
+    target_schema: "dwh_ods"
+    target_table: "stmt_bucket_sys_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_bucket_type_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_bucket_type_def"
+    target_schema: "dwh_ods"
+    target_table: "stmt_bucket_type_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_calc_details"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_calc_details"
+    target_schema: "dwh_ods"
+    target_table: "stmt_calc_details"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_crd_account_point"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_crd_account_point"
+    target_schema: "dwh_ods"
+    target_table: "stmt_crd_account_point"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_posting_model_def"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_posting_model_def"
+    target_schema: "dwh_ods"
+    target_table: "stmt_posting_model_def"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_shifting_hist"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_shifting_hist"
+    target_schema: "dwh_ods"
+    target_table: "stmt_shifting_hist"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_summary"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_summary"
+    target_schema: "dwh_ods"
+    target_table: "stmt_summary"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "stmt_summary_hist"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "stmt_summary_hist"
+    target_schema: "dwh_ods"
+    target_table: "stmt_summary_hist"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false
+
+    ################################################################### target_table: "txn_collected_fin_adj"
+  - source_schema: "ocn_iss"
+    source_type: table
+    source_table: "txn_collected_fin_adj"
+    target_schema: "dwh_ods"
+    target_table: "txn_collected_fin_adj"
+    load_method: "create_if_not_exists_or_truncate"
+
+    where: ""
+    order_by: ""
+    passthrough_full: true
+    passthrough_format: "binary"
+    passthrough_spool_max_mb: 2048
+    partitioning:
+      enabled: false

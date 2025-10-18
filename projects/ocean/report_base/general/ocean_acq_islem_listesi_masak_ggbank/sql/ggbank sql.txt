@@ -1,0 +1,180 @@
+---header
+select 'H' || to_char(now() - INTERVAL '1 DAY','YYYYMMDD') ||
+        LPAD(cast(coalesce((select "sequence" + 1 from ocn_btc.file_pattern_sequence 
+               where "key" = 'AcquiringTxnReport' and execution_date = to_number(to_char(now() - INTERVAL '1 DAY','YYYYMMDD'),'99999999') limit 1), 1) as varchar),
+                   16, '0') || LPAD('V00001', 12, '0') H;
+
+
+--    footer
+select 'F' || to_char(now() - INTERVAL '1 DAY','YYYYMMDD') || LPAD((SELECT cast(COUNT(*) as varchar) 
+FROM
+(select
+mtp.txn_guid
+from ocn_acq.mrc_txn_pool mtp
+inner join ocn_acq.mrc_txn_blocked_transaction mtbt on mtp.guid = mtbt.pool_guid
+inner join ocn_cfg.txn_def_member tdm on mtp.txn_def_guid = tdm.txn_def_guid
+inner join ocn_acq.mrc_merchant mm on mm.guid = mtp.merchant_guid
+inner join ocn_cfg.txn_def td on td.guid = mtp.txn_def_guid
+left outer join ocn_acq.mrc_product_segment_def mpsd on mpsd.guid = mtp.product_segment_guid
+inner join ocn_acq.txn_acquirer ta on ta.guid = mtp.txn_guid
+where
+mtp.is_processed = 1 and
+mtp.eod_date = to_number(to_char(now() - INTERVAL '1 DAY','YYYYMMDD'),'99999999') and
+mtp.mbr_id = 301 and mm.nsw_unique_id is not null
+union all
+select
+mtp.txn_guid
+from ocn_acq.mrc_txn_pool mtp
+inner join ocn_acq.mrc_txn_blocked_transaction mtbt on mtp.guid = mtbt.pool_guid
+inner join ocn_cfg.member_definition md on mtp.mbr_id = md.mbr_id
+inner join ocn_cfg.txn_def_member tdm on mtp.txn_def_guid = tdm.txn_def_guid
+inner join ocn_acq.mrc_merchant mm on mm.guid = mtp.merchant_guid
+inner join ocn_cfg.txn_def td on td.guid = mtp.txn_def_guid
+left outer join ocn_acq.mrc_product_segment_def mpsd on mpsd.guid = mtp.product_segment_guid
+inner join ocn_iss.txn_issuer ti on ti.guid = mtp.txn_guid
+inner join ocn_iss.crd_card crd on crd.guid = ti.card_guid
+inner join ocn_iss.cst_customer cst on cst.customer_no = crd.customer_no
+inner join ocn_iss.cst_customer_identity id on id.customer_no = cst.customer_no
+where
+mtp.is_processed = 1 and
+ti.txn_stt = 'N' and
+mtp.eod_date = to_number(to_char(now() - INTERVAL '1 DAY','YYYYMMDD'),'99999999') and 
+mtp.mbr_id = 301 and mm.nsw_unique_id is not null) as count_table), 10, '0') F
+
+
+
+
+
+----data
+select
+mtp.txn_guid,
+mtbt.block_no,
+mtp.card_no,
+mm.code as merchant_code,
+mtp.terminal_id as terminal_code,
+mtp.batch_no,
+mtp.txn_date,
+mtp.txn_time,
+round(mtp.txn_amount * 100) as txn_amount,
+mtp.currency_code,
+round(mtp.settlement_amount * 100) as settlement_amount,
+mtp.settlement_currency,
+round(mtp.clearing_commission_amount * 10000) as clearing_commission_amount,
+td.otc,
+td.ots,
+td.install_type,
+coalesce(tdm.banking_txn_code,td.processing_txn_code) as banking_txn_code,
+td.txn_effect,
+mtp.install_count,
+mtp.txn_source,
+mtp.txn_region,
+mtp.bin_product_type,
+coalesce(mpsd.code, '') as card_segment_code,
+mtp.txn_terminal_type,
+mtp.txn_entry,
+mtp.card_source,
+mtp.card_brand,
+mtp.card_dci,
+mtp.f43,
+mtp.f43_name,
+mtp.f43_city,
+mtp.f43_state,
+mtp.f43_country,
+mtp.auth_code,
+mtp.stan,
+mtp.rrn,
+mtp.mcc,
+round(mtp.lyl_bc_amnt + mtp.lyl_cmpg_bc_amnt * 100) as bank_point,
+round(mtp.lyl_mc_amnt + mtp.lyl_cmpg_mc_amnt * 100) as merchant_point,
+mtp.lyl_add_inst_cnt,
+mtp.lyl_defered_days,
+round(mtbt.commission_rate * 100000) as commission_rate,
+round(mtbt.loyalty_commission_rate * 100000) as loyalty_commission_rate,
+mtbt.block_day1,
+mtbt.block_type,
+mtp.link_guid,
+mm.nsw_unique_id as bkm_id,
+ta.f20 as card_country,
+'' as customer_name,
+'' as customer_surname,
+'' as customer_nationality
+from ocn_acq.mrc_txn_pool mtp
+inner join ocn_acq.mrc_txn_blocked_transaction mtbt on mtp.guid = mtbt.pool_guid and mtbt.mbr_id = 301
+inner join ocn_cfg.txn_def_member tdm on mtp.txn_def_guid = tdm.txn_def_guid and tdm.mbr_id = 301
+inner join ocn_acq.mrc_merchant mm on mm.guid = mtp.merchant_guid and mm.mbr_id = 301
+inner join ocn_cfg.txn_def td on td.guid = mtp.txn_def_guid
+left outer join ocn_acq.mrc_product_segment_def mpsd on mpsd.guid = mtp.product_segment_guid and mpsd.mbr_id = 301
+inner join ocn_acq.txn_acquirer ta on ta.guid = mtp.txn_guid and ta.mbr_id = 301
+where --mtp.txn_guid >= 4000000122532983 and /*Bu kismi test islemlerinden sonra kaldiracagim*/
+mtp.is_processed = 1 and
+mtp.eod_date = to_number(to_char(now() - INTERVAL '1 DAY','YYYYMMDD'),'99999999') and
+mtp.mbr_id = 301 and mm.nsw_unique_id is not null
+union all
+select
+mtp.txn_guid,
+mtbt.block_no,
+mtp.card_no,
+mm.code as merchant_code,
+mtp.terminal_id as terminal_code,
+mtp.batch_no,
+mtp.txn_date,
+mtp.txn_time,
+round(mtp.txn_amount * 100) as txn_amount,
+mtp.currency_code,
+round(mtp.settlement_amount * 100) as settlement_amount,
+mtp.settlement_currency,
+round(mtp.clearing_commission_amount * 10000) as clearing_commission_amount,
+td.otc,
+td.ots,
+td.install_type,
+coalesce(tdm.banking_txn_code,td.processing_txn_code) as banking_txn_code,
+td.txn_effect,
+mtp.install_count,
+mtp.txn_source,
+mtp.txn_region,
+mtp.bin_product_type,
+coalesce(mpsd.code, '') as card_segment_code,
+mtp.txn_terminal_type,
+mtp.txn_entry,
+mtp.card_source,
+mtp.card_brand,
+mtp.card_dci,
+mtp.f43,
+mtp.f43_name,
+mtp.f43_city,
+mtp.f43_state,
+mtp.f43_country,
+mtp.auth_code,
+mtp.stan,
+mtp.rrn,
+mtp.mcc,
+round(mtp.lyl_bc_amnt + mtp.lyl_cmpg_bc_amnt * 100) as bank_point,
+round(mtp.lyl_mc_amnt + mtp.lyl_cmpg_mc_amnt * 100) as merchant_point,
+mtp.lyl_add_inst_cnt,
+mtp.lyl_defered_days,
+round(mtbt.commission_rate * 100000) as commission_rate,
+round(mtbt.loyalty_commission_rate * 100000) as loyalty_commission_rate,
+mtbt.block_day1,
+mtbt.block_type,
+mtp.link_guid,
+mm.nsw_unique_id as bkm_id,
+md.country_code::numeric(3, 0) card_country,
+cast(cst."name" || ' ' || cst.midname as varchar(60)) as customer_name,
+cast(cst.surname as varchar(30)) as customer_surname,
+cast(id.nationality as varchar(30)) as customer_nationality
+from ocn_acq.mrc_txn_pool mtp
+inner join ocn_acq.mrc_txn_blocked_transaction mtbt on mtp.guid = mtbt.pool_guid and mtbt.mbr_id = 301
+inner join ocn_cfg.member_definition md on mtp.mbr_id = md.mbr_id and md.mbr_id = 301
+inner join ocn_cfg.txn_def_member tdm on mtp.txn_def_guid = tdm.txn_def_guid and tdm.mbr_id = 301
+inner join ocn_acq.mrc_merchant mm on mm.guid = mtp.merchant_guid and mm.mbr_id = 301
+inner join ocn_cfg.txn_def td on td.guid = mtp.txn_def_guid
+left outer join ocn_acq.mrc_product_segment_def mpsd on mpsd.guid = mtp.product_segment_guid and mpsd.mbr_id = 301
+inner join ocn_iss.txn_issuer ti on ti.guid = mtp.txn_guid and ti.mbr_id = 301
+inner join ocn_iss.crd_card crd on crd.guid = ti.card_guid and crd.mbr_id = 301
+inner join ocn_iss.cst_customer cst on cst.customer_no = crd.customer_no and cst.mbr_id = 301
+inner join ocn_iss.cst_customer_identity id on id.customer_no = cst.customer_no
+where --mtp.txn_guid >= 4000000122532983 and /*Bu kismi test islemlerinden sonra kaldiracagim*/
+mtp.is_processed = 1 and
+ti.txn_stt = 'N' and
+mtp.eod_date = to_number(to_char(now() - INTERVAL '1 DAY','YYYYMMDD'),'99999999') and 
+mtp.mbr_id = 301 and mm.nsw_unique_id is not null;
