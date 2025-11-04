@@ -10,7 +10,7 @@ pipeline {
         REGISTRY_URL = "artifacts.paycore.com"
         IMAGE_NAME = "apache/airflow"
         DOCKER_CREDENTIALS_ID = "docker-publisher"
-        ENVIRONMENT="test"
+        ENVIRONMENT="prod"
     }
     stages {
         stage('Build Docker Image') {

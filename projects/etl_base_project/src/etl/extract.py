@@ -42,20 +42,22 @@ class Extractor:
         where = (kwargs.get("where") or "").strip()
         order_by = (kwargs.get("order_by") or "").strip()
 
-        if self.sql_text:
-            sql = self.sql_text
+        if self.sql_text and self.sql_text.strip():
+            # SQL kaynağı: alt sorgu olarak sar, WHERE/ORDER dışarıda uygula
+            sql = f"SELECT * FROM ({self.sql_text}) AS _src"
             if where:
-                sql += f" and {where}"
+                sql += f" WHERE {where}"
             if order_by:
                 sql += f" ORDER BY {order_by}"
-            logger.info(f"[INFO] sql_text file result= {sql}")
-        else:                    
+            logger.info(f"[INFO] run(sql_text):\n{sql}")
+        else:
             sql = f'SELECT * FROM "{self.source_schema}"."{self.source_table}"'
             if where:
                 sql += f" WHERE {where}"
             if order_by:
                 sql += f" ORDER BY {order_by}"
-            logger.info(f"[INFO] sql genereted {sql}")
+            logger.info(f"[INFO] run(table):\n{sql}")
+
         rows, cols = self.__execute_query(self.src_conn, sql)
         return pd.DataFrame(rows, columns=cols)
 
@@ -338,73 +340,93 @@ class Extractor:
 
     def copy_select_to_filelike(
         self,
-        columns: List[str] | None,     # mapping modunda None gelebilir
+        columns: List[str] | None,
         file_obj,
         *,
         where: Optional[str] = None,
         order_by: Optional[str] = None,
         fmt: str = "binary",
         null: str = r"\N",
-        select_items: List[str] | None = None,   # ← YENİ: mapping modunda SELECT listesi
+        select_items: List[str] | None = None,
     ) -> None:
         """
-        Kaynaktan SELECT'i doğrudan COPY TO STDOUT ile file_obj'a döker.
-        fmt="binary" → Python tarafında parse yok.
+        Kaynaktan SELECT'i COPY TO STDOUT ile file_obj'a döker.
+        - self.sql_text varsa: FROM (<sql_text>) AS _src
+        - yoksa: FROM "schema"."table"
         """
-        if select_items and len(select_items) > 0:
-            inner_select = f"""
-                SELECT {", ".join(select_items)}
-                FROM {self._qual(self.source_schema, self.source_table)}
-                {("WHERE " + where) if where else ""}
-                {("ORDER BY " + order_by) if order_by else ""}
-            """
+        # 1) FROM kaynağı
+        if self.sql_text and self.sql_text.strip():
+            from_clause = f"({self.sql_text}) AS _src"
+            quote_cols = False  # alt sorguda alias'lar zaten uygun isimlerle gelir
         else:
-            # eski davranış (columns listesi)
-            assert columns is not None and len(columns) > 0, "columns or select_items must be provided"
-            cols_sql = ", ".join(f'"{c}"' for c in columns)
-            inner_select = f"""
-                SELECT {cols_sql}
-                FROM {self._qual(self.source_schema, self.source_table)}
-                {("WHERE " + where) if where else ""}
-                {("ORDER BY " + order_by) if order_by else ""}
-            """
+            if not self.source_schema or not self.source_table:
+                raise ValueError("Extractor: table kaynağı için source_schema/source_table zorunlu.")
+            from_clause = self._qual(self.source_schema, self.source_table)
+            quote_cols = True
 
+        # 2) SELECT listesi
+        if select_items and len(select_items) > 0:
+            select_sql = ", ".join(select_items)
+        else:
+            assert columns is not None and len(columns) > 0, "columns veya select_items sağlanmalı"
+            if quote_cols:
+                select_sql = ", ".join(f'"{c}"' for c in columns)
+            else:
+                select_sql = ", ".join(f"{c}" for c in columns)
+
+        # 3) WHERE / ORDER BY
+        where_sql = f"WHERE {where}" if (where and where.strip()) else ""
+        order_sql = f"ORDER BY {order_by}" if (order_by and order_by.strip()) else ""
+
+        inner_select = f"""
+            SELECT {select_sql}
+            FROM {from_clause}
+            {where_sql}
+            {order_sql}
+        """
+
+        # 4) COPY
         if fmt == "binary":
             copy_sql = f"COPY ({inner_select}) TO STDOUT WITH (FORMAT binary)"
         else:
             copy_sql = f"COPY ({inner_select}) TO STDOUT WITH (FORMAT csv, HEADER false, NULL '{null}')"
 
+        logger.info("[passthrough] COPY SELECT:\n%s", inner_select)
         with self.src_conn.cursor() as cur:
             cur.copy_expert(copy_sql, file_obj)
     
     def copy_select_to_filelike_binary(
         self,
         columns: List[str],
-        file_obj,                      # binary mode'da: write() alacak
+        file_obj,
         where: Optional[str] = None,
         order_by: Optional[str] = None,
         statement_timeout_ms: Optional[int] = None,
     ) -> None:
         """
-        Kaynak DB'den seçili kolonları BINARY olarak STDOUT'a kopyalar.
-        Büyük veride Python CPU tüketimini minimumda tutar.
+        Kaynak veriyi BINARY olarak STDOUT'a kopyalar.
+        self.sql_text varsa alt-sorgu olarak kullanır.
         """
-        cols_sql = ", ".join(self._qident(c) for c in columns)
-        src_qual = self._qual(self.source_schema, self.source_table)
+        if self.sql_text and self.sql_text.strip():
+            from_clause = f"({self.sql_text}) AS _src"
+            cols_sql = ", ".join(f"{c}" for c in columns)  # alt-sorguda çıplak
+        else:
+            from_clause = self._qual(self.source_schema, self.source_table)
+            cols_sql = ", ".join(self._qident(c) for c in columns)
 
-        clauses = []
-        if where and where.strip():
-            clauses.append(f"WHERE {where}")
-        if order_by and order_by.strip():
-            clauses.append(f"ORDER BY {order_by}")
+        where_sql = f"WHERE {where}" if (where and where.strip()) else ""
+        order_sql = f"ORDER BY {order_by}" if (order_by and order_by.strip()) else ""
 
-        inner = f"SELECT {cols_sql} FROM {src_qual} " + (" ".join(clauses) if clauses else "")
-        sql   = f"COPY ({inner}) TO STDOUT WITH (FORMAT binary)"
+        inner = f"""
+            SELECT {cols_sql}
+            FROM {from_clause}
+            {where_sql}
+            {order_sql}
+        """
+        sql = f"COPY ({inner}) TO STDOUT WITH (FORMAT binary)"
 
         logger.info("[passthrough-binary] COPY TO STDOUT:\n%s", inner)
-
         with self.src_conn.cursor() as cur:
             if statement_timeout_ms:
-                # yalnızca bu transaction için:
                 cur.execute(f"SET LOCAL statement_timeout = {int(statement_timeout_ms)}")
-            cur.copy_expert(sql, file_obj)  # file_obj.write(binary_chunk) çağrılır
+            cur.copy_expert(sql, file_obj)

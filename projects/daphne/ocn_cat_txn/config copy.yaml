@@ -1,0 +1,34 @@
+source_db_var: "daphne"
+target_db_var: "dwh"
+
+etl_tasks:
+  - source_schema: "ocn_cat_txn"
+    source_table: "cat_trnx_log_processing"
+    target_schema: "ocn_cat_txn"
+    target_table: "cat_trnx_log_processing"
+    load_method: "dates_by_day"
+    date_column: "system_date"
+    unique_key_column: "txn_guid"     # sıralanabilir tekil kolon (opsiyonel)
+    # keyset_page_size: 300000         # passthrough kapalıysa chunk’lar için
+    passthrough_copy: true             # ← hızlı yol
+    passthrough_spool_max_mb: 1024      # RAM limiti (default 256)
+    date_start: "20250401"
+    date_end:   "20250801"
+    multiprocess: false
+  
+  - source_schema: "ocn_cat_txn"
+    source_table: "cat_message_history"
+    target_schema: "ocn_cat_txn"
+    target_table: "cat_message_history"
+    load_method: "dates_by_day"
+    date_column: "system_date"
+    unique_key_column: "trnx_guid"     # sıralanabilir tekil kolon (opsiyonel)
+    # keyset_page_size: 300000         # passthrough kapalıysa chunk’lar için
+    passthrough_copy: true             # ← hızlı yol
+    passthrough_spool_max_mb: 1024      # RAM limiti (default 256)
+    date_start: "20250805"
+    date_end:   "20250811"
+    multiprocess: false
+
+
+    #message histoyr data yok, log processing BANLI!

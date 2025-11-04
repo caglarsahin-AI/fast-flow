@@ -1,1 +1,0 @@
-select * from ocn_iss.crd_card limit 10;

@@ -9,7 +9,7 @@ etl_tasks:
     source_schema: "ocn_iss"
     source_table: "crd_account_balance_used_hist"
     target_schema: "dwh_stg"
-    target_table: "crd_account_balance_used_hist"
+    target_table: "crd_account_balance_used_hist_1"
     load_method: "create_if_not_exists_or_truncate"   #drop_and_create drop_if_exists_and_create   create_if_not_exists_or_truncate  create_if_not_exists
     
     column_mapping_mode: "mapping_file"  # source |  mapping_file   # source: kaynak tablo yapısı  # mapping_file: mapping dosyası kullan
@@ -26,10 +26,10 @@ etl_tasks:
           FROM ocn_iss.crd_account_balance_used_hist
         default: 19000101
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 1024
-    batch_size: 100_000
+    pipe_queue_max: 32
+    batch_size: 10000
     
     partitioning:
       enabled: true
@@ -53,10 +53,10 @@ etl_tasks:
     where: "" 
     bindings: {}
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 1024
-    batch_size: 100_000
+    pipe_queue_max: 32
+    batch_size: 10000
     
     partitioning:
       enabled: true
@@ -79,10 +79,10 @@ etl_tasks:
     where: "" 
     bindings: {}
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 1024
-    batch_size: 100_000
+    pipe_queue_max: 32
+    batch_size: 10000
     
     partitioning:
       enabled: true
@@ -107,10 +107,10 @@ etl_tasks:
     where: "" 
     bindings: {}
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 1024
-    batch_size: 100_000
+    pipe_queue_max: 32
+    batch_size: 10000
     
     partitioning:
       enabled: true
@@ -126,7 +126,7 @@ etl_tasks:
     source_schema: "ocn_iss"
     source_table: "crd_card_delivery"
     target_schema: "dwh_stg"
-    target_table: "crd_card_delivery"
+    target_table: "crd_card_delivery_1"
     load_method: "create_if_not_exists_or_truncate"
 
     column_mapping_mode: "source"  # source
@@ -135,7 +135,7 @@ etl_tasks:
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -170,7 +170,7 @@ etl_tasks:
     source_schema: "ocn_iss"
     source_table: "crd_courier_feedback"
     target_schema: "dwh_stg"
-    target_table: "crd_courier_feedback"
+    target_table: "crd_courier_feedback_1"
     load_method: "create_if_not_exists_or_truncate"
 
     column_mapping_mode: "source"  # source
@@ -186,10 +186,10 @@ etl_tasks:
           from ocn_iss.crd_courier_feedback
         default: 19000101
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 1024
-    batch_size: 100000
+    pipe_queue_max: 32
+    batch_size: 10000
 
     partitioning:
       enabled: false
@@ -201,7 +201,7 @@ etl_tasks:
     source_schema: "ocn_iss"
     source_table: "crd_stoplist_info"
     target_schema: "dwh_stg"
-    target_table: "crd_stoplist_info"
+    target_table: "crd_stoplist_info_1"
     load_method: "create_if_not_exists_or_truncate"
 
     column_mapping_mode: "source"  # source
@@ -226,10 +226,10 @@ etl_tasks:
           select to_char(current_date,'YYYYMMDD')::integer
         default: 19000101
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 1024
-    batch_size: 100000
+    pipe_queue_max: 32
+    batch_size: 10000
 
     partitioning:
       enabled: false
@@ -241,7 +241,7 @@ etl_tasks:
     source_schema: "ocn_iss"
     source_table: "txn_cycle"
     target_schema: "dwh_stg"
-    target_table: "txn_cycle"
+    target_table: "txn_cycle_1"
     load_method: "create_if_not_exists_or_truncate"
 
     column_mapping_mode: "source"  # source
@@ -266,8 +266,8 @@ etl_tasks:
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 1024
-    batch_size: 100000
+    pipe_queue_max: 32
+    batch_size: 10000
 
     partitioning:
       enabled: false
@@ -278,7 +278,7 @@ etl_tasks:
     source_schema: "ocn_iss"
     source_table: "txn_info_issuer"
     target_schema: "dwh_stg"
-    target_table: "txn_info_issuer"
+    target_table: "txn_info_issuer_1"
     load_method: "create_if_not_exists_or_truncate"
 
     column_mapping_mode: "source"  # source
@@ -298,10 +298,10 @@ etl_tasks:
           select to_char(current_date,'YYYYMMDD')::integer
         default: 19000101
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 1024
-    batch_size: 100000
+    pipe_queue_max: 32
+    batch_size: 10000
 
     partitioning:
       enabled: false
@@ -314,7 +314,7 @@ etl_tasks:
     source_schema: "ocn_iss"
     source_table: "txn_issuer"
     target_schema: "dwh_stg"
-    target_table: "txn_issuer"
+    target_table: "txn_issuer_1"
     load_method: "create_if_not_exists_or_truncate"
 
     column_mapping_mode: "source"  # source
@@ -334,10 +334,10 @@ etl_tasks:
           select to_char(current_date,'YYYYMMDD')::integer
         default: 19000101
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 1024
-    batch_size: 100000
+    pipe_queue_max: 32
+    batch_size: 10000
 
     partitioning:
       enabled: false
@@ -350,7 +350,7 @@ etl_tasks:
     source_schema: "ocn_iss"
     source_table: "txn_issuer_expire"
     target_schema: "dwh_stg"
-    target_table: "txn_issuer_expire"
+    target_table: "txn_issuer_expire_1"
     load_method: "create_if_not_exists_or_truncate"
 
     column_mapping_mode: "source"  # source
@@ -370,10 +370,10 @@ etl_tasks:
           select to_char(current_date,'YYYYMMDD')::integer
         default: 19000101
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 1024
-    batch_size: 100000
+    pipe_queue_max: 32
+    batch_size: 10000
 
     partitioning:
       enabled: false
@@ -391,7 +391,7 @@ etl_tasks:
   ##  order_by: ""
   ##  passthrough_full: true
   ##  passthrough_format: "binary"
-  ##  passthrough_spool_max_mb: 2048
+  ##  pipe_queue_max: 32
   ##  partitioning:
   ##    enabled: false
 

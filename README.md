@@ -208,24 +208,6 @@ pipeline {
 
 ## ETL Projects & DAGs
 
-## Mapping Template Generator
-
-- Script location: `projects/etl_base_project/src/utilities/mapping_generator.py`.
-- Generates a starter `mapping.yaml` by inspecting a source table without needing Airflow.
-- Example usage:  airflow variable'ları kullanıldığından, docker içerisinden komut çalıştırılması uygundur
-
-```bash
-docker exec -it airflow_webserver python -c "from projects.etl_base_project.src.utilities import mapping_generator as mg; mg.start_main('crd_account_balance_used_hist','/opt/airflow/projects/ocean/ocn_iss/level1/src_to_stg/crd_account_balance_used_hist')"
-
-```bash
-docker exec -it airflow_webserver python -m projects.etl_base_project.src.utilities.mapping_generator   --host LSR_IST0PSQLOCN.mtf.mptsturkey.org --port 5432   --database OCEANTEST --user dts --password Efvgt6?%gs  --schema ocn_iss --table txn_issuer_security   --output projects/ocean/ocn_iss/level1/src_to_stg/txn_issuer_security_1/mapping.yaml
-```
-
-```bash
-docker exec -it airflow_webserver python -m projects.etl_base_project.src.utilities.mapping_generator   --host LSR_IST0PSQLOCN.mtf.mptsturkey.org --port 5432   --database OCEANTEST --user dts --password Efvgt6?%gs  --schema ocn_iss --table txn_issuer_security   --output projects/ocean/ocn_iss/level1/src_to_stg/txn_issuer_security_1/mapping.yaml --sql_file projects/ocean/ocn_iss/level1/src_to_stg/txn_issuer_security_1/sql.sql
-
-- Use `--overwrite` if you need to regenerate an existing file.
-
 - Place each DAG definition (`.py`) into the `dags/` folder.
 - Organize your Python modules/packages under `projects/` and import them in DAGs.
 - Custom email functionality is implemented in `plugins/send_email_custom.py`.
@@ -271,17 +253,3 @@ git checkout <branch_name>
 
 *Run all commands from the repository root directory.*
 
-
-_resolve_mapping_path
-
-maping file adresinin bulunması
-kwargs.get("mapping_file")   veya wargs.get("task_id")  veya kwargs.get("target_table")  
-
-ek klasör seçenekleri
-base_env = os.environ.get("ETL_MAPPING_BASE", "").strip()
-dag_dir  = (kwargs.get("dag_dir") or "").strip()  # istersen DAG tarafında op_kwargs ile geçirilebilir
-
-
-
-
-Kaynak SQl ise mode distinct olabilir sadece, ve key alan üzerinden part part aktarım yapılarak partition sağlanabilir.

@@ -3,28 +3,23 @@ services:
   postgres:
     image: artifacts.paycore.com/postgres:13
     container_name: airflow_postgres
+    mem_limit: 2g
     restart: always
     environment:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
-      #POSTGRES_SHARED_BUFFERS: "8GB"        # RAM'in %25'i
-      #POSTGRES_EFFECTIVE_CACHE_SIZE: "24GB" # RAM'in %75'i
-      #POSTGRES_WORK_MEM: "128MB"            # 40 conn * 128MB = 5GB
-      #POSTGRES_MAINTENANCE_WORK_MEM: "2GB"
-      #POSTGRES_MAX_CONNECTIONS: "100"
     ports:
       - "5432:5432"
     volumes:
-      #- ./pgdata:/var/lib/postgresql/data
-      #windows olduğundan
-      - postgres_data:/var/lib/postgresql/data  
+      - ./pgdata:/var/lib/postgresql/data
+      #- postgres_data:/var/lib/postgresql/data
     command: >
         postgres
-        -c shared_buffers=8GB
-        -c effective_cache_size=24GB
-        -c work_mem=128MB
-        -c maintenance_work_mem=2GB
+        -c shared_buffers=1GB
+        -c effective_cache_size=2GB
+        -c work_mem=32MB
+        -c maintenance_work_mem=1GB
         -c max_connections=100
         -c checkpoint_completion_target=0.9
         -c wal_buffers=16MB
@@ -33,14 +28,14 @@ services:
         -c max_worker_processes=8
         -c max_parallel_workers_per_gather=4
         -c max_parallel_workers=8
-    healthcheck:  # ← Ekleyin
+    healthcheck:  
       test: ["CMD-SHELL", "pg_isready -U airflow"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   airflow-init:
-    image: artifacts.paycore.com/apache/airflow:2.7.2-python3.9.2-test
+    image: artifacts.paycore.com/apache/airflow:2.7.2-python3.9.13-prod
     container_name: airflow_init
     depends_on:
       - postgres
@@ -64,11 +59,13 @@ services:
       - .:/opt/airflow
       - ./dags:/opt/airflow/dags
 
+
   airflow-webserver:
-    image: artifacts.paycore.com/apache/airflow:2.7.2-python3.9.2-test
+    image: artifacts.paycore.com/apache/airflow:2.7.2-python3.9.13-prod
     container_name: airflow_webserver
+    mem_limit: 4g 
     restart: always
-    depends_on:      
+    depends_on:
       airflow-init:
         condition: service_completed_successfully
       postgres:
@@ -81,61 +78,39 @@ services:
       AIRFLOW__WEBSERVER__DEFAULT_USER_USERNAME: admin
       AIRFLOW__WEBSERVER__DEFAULT_USER_PASSWORD: admin
       PYTHONPATH: /opt/airflow:/opt/airflow/projects/etl_base_project
-      # DB pool (scheduler/webserver paylaşıyor)
-      #AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_SIZE: "20"
-      #AIRFLOW__DATABASE__SQL_ALCHEMY_MAX_OVERFLOW: "20"
-      #AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_RECYCLE: "1800"
       AIRFLOW__WEBSERVER__WORKERS: "9"
       AIRFLOW__WEBSERVER__WEB_SERVER_WORKER_TIMEOUT: 180
-      AIRFLOW__CORE__LOAD_EXAMPLES: "False"      
-      _PIP_ADDITIONAL_REQUIREMENTS: "debugpy==1.8.5"
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"    
     ports:
       - "8080:8080"
     volumes:
       - .:/opt/airflow
-      #- ./dags:/opt/airflow/dags 
-      #- /etc/localtime:/etc/localtime:ro
-      #- /etc/timezone:/etc/timezone:ro
-      #- /usr/local/lib/python3.9/site-packages:/home/airflow/.local/lib/python3.8/site-packages:ro
-      #- /usr/lib/python3.9/dist-packages:/usr/local/lib/python3.8/dist-packages:ro
+      - ./dags:/opt/airflow/dags 
       - /var/run/docker.sock:/var/run/docker.sock
     command: webserver
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 8g
     ulimits:
       nofile:
         soft: 65536
         hard: 65536
     shm_size: "2g"         # büyük DataFrame/log render vs. için faydalı
 
-
   airflow-scheduler:
-    image: artifacts.paycore.com/apache/airflow:2.7.2-python3.9.2-test
+    image: artifacts.paycore.com/apache/airflow:2.7.2-python3.9.13-prod
     container_name: airflow_scheduler
-    #build:
-    #  context: .                     # Dockerfile’ın bulunduğu klasör
-    #  dockerfile: Dockerfile         # adı farklıysa yaz (örn: Dockerfile.airflow)
-    ports:
-      - "5678:5678"        # debugpy için
-    #extra_hosts:
-    #- "LSR_IST0PSQLOCN.mtf.mptsturkey.org:10.29.0.28"  # Bulduğunuz IP
+    mem_limit: 24g 
     restart: always
-    depends_on:      
+    depends_on:
       airflow-init:
         condition: service_completed_successfully
       postgres:
         condition: service_healthy
     environment:
       TZ: Europe/Istanbul
-      ENABLE_DEBUG: "1"    # sadece debug gerektiğinde 1 aç
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__DEFAULT_TIMEZONE: Europe/Istanbul
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
       PYTHONPATH: /opt/airflow:/opt/airflow/projects/etl_base_project
-       # ---- ÖNEMLİ: Scheduler & LocalExecutor paralellik ayarları ----
+      # ---- ÖNEMLİ: Scheduler & LocalExecutor paralellik ayarları ----
       # Global eşzamanlı task limiti
       AIRFLOW__CORE__PARALLELISM: "16"
       # Bir DAG başına aktif task
@@ -144,12 +119,10 @@ services:
       AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: "2"
       # Default pool slotları (yoksa pool limitine takılırsınız)
       AIRFLOW__CORE__NON_POOLED_TASK_SLOT_COUNT: "16"
-
       # Dynamic task mapping ile ilgili pratik limit
       AIRFLOW__CORE__MAX_MAP_LENGTH: "100000"
-
       # Scheduler tuning
-      AIRFLOW__SCHEDULER__PARSING_PROCESSES: "2"           # CPU çekirdeği kadar (örn 4)
+      AIRFLOW__SCHEDULER__PARSING_PROCESSES: "4"           # CPU çekirdeği kadar (örn 4)
       AIRFLOW__SCHEDULER__MAX_TIS_PER_QUERY: "256"         # DB’den alınan TI sayısı
       AIRFLOW__SCHEDULER__SCHEDULER_HEARTBEAT_SEC: "5"     # 1 daha sık heartbeat yerine 5 daha stable
       AIRFLOW__SCHEDULER__JOB_HEARTBEAT_SEC: "15"  # ← YENİ (DNS hatası için)
@@ -159,39 +132,23 @@ services:
       AIRFLOW__SCHEDULER__MAX_DAGRUNS_TO_CREATE_PER_LOOP: "10"
       AIRFLOW__SCHEDULER__MAX_DAGRUNS_PER_LOOP_TO_SCHEDULE: "10"
       AIRFLOW__SCHEDULER__ORPHANED_TASKS_CHECK_INTERVAL: "300"
-      _PIP_ADDITIONAL_REQUIREMENTS: "debugpy==1.8.5"
-
-      # DB pool
-      #AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_SIZE: "40"
-      #AIRFLOW__DATABASE__SQL_ALCHEMY_MAX_OVERFLOW: "40"
-      #AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_RECYCLE: "1800"
-
-      # Python mikro-optimizasyonları 
-      #PYTHONOPTIMIZE: "1"
-      #PYTHONDONTWRITEBYTECODE: "1"
+      AIRFLOW__LOGGING__LOG_RETENTION_DAYS: "7"
     volumes:
       - .:/opt/airflow
-      #- ./dags:/opt/airflow/dags
-      #- /usr/local/lib/python3.9/site-packages:/home/airflow/.local/lib/python3.8/site-packages:ro
-      #- /usr/lib/python3.9/dist-packages:/usr/local/lib/python3.8/dist-packages:ro
+      - ./dags:/opt/airflow/dags
       - /var/run/docker.sock:/var/run/docker.sock
     command: scheduler
     deploy:
       resources:
         limits:
-          cpus: "4.0"      # scheduler’a CPU verin
-          memory: 8g
+          cpus: "7.0"      # scheduler’a CPU verin
+          memory: 24g
     ulimits:
       nofile:
         soft: 65536
         hard: 65536
     shm_size: "4g"
     tmpfs:
-      - /tmp:size=8g,noexec,nosuid,nodev  # SpooledTemporaryFile + COPY buffer için hızlı tmpfs
+      - /tmp:size=14g,noexec,nosuid,nodev  # SpooledTemporaryFile + COPY buffer için hızlı tmpfs
 
 
-
-
-# windows set
-volumes:
-  postgres_data:

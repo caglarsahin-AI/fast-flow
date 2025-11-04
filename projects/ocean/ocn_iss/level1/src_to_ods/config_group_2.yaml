@@ -6,7 +6,7 @@ etl_tasks:
   - source_schema: "ocn_iss"
     source_table: "crd_card_no_name"
     target_schema: "dwh_ods"
-    target_table: "crd_card_no_name"
+    target_table: "crd_card_no_name_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -21,7 +21,7 @@ etl_tasks:
   - source_schema: "ocn_iss"
     source_table: "crd_courier"
     target_schema: "dwh_ods"
-    target_table: "crd_courier"
+    target_table: "crd_courier_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -38,7 +38,7 @@ etl_tasks:
   - source_schema: "ocn_iss"
     source_table: "crd_courier_message_def"
     target_schema: "dwh_ods"
-    target_table: "crd_courier_message_def"
+    target_table: "crd_courier_message_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -53,7 +53,7 @@ etl_tasks:
   - source_schema: "ocn_iss"
     source_table: "crd_product"
     target_schema: "dwh_ods"
-    target_table: "crd_product"
+    target_table: "crd_product_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -68,7 +68,7 @@ etl_tasks:
   - source_schema: "ocn_iss"
     source_table: "crd_profile_map"
     target_schema: "dwh_ods"
-    target_table: "crd_profile_map"
+    target_table: "crd_profile_map_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -83,7 +83,7 @@ etl_tasks:
   - source_schema: "ocn_iss"
     source_table: "crd_profile_rel"
     target_schema: "dwh_ods"
-    target_table: "crd_profile_rel"
+    target_table: "crd_profile_rel_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -98,7 +98,7 @@ etl_tasks:
   - source_schema: "ocn_iss"
     source_table: "crd_stat_def"
     target_schema: "dwh_ods"
-    target_table: "crd_stat_def"
+    target_table: "crd_stat_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -114,7 +114,7 @@ etl_tasks:
     source_type: table
     source_table: "crd_stat_reason_def"
     target_schema: "dwh_ods"
-    target_table: "crd_stat_reason_def"
+    target_table: "crd_stat_reason_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -131,7 +131,7 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer"
     target_schema: "dwh_ods"
-    target_table: "cst_customer"
+    target_table: "cst_customer_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -147,7 +147,7 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_account"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_account"
+    target_table: "cst_customer_account_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -163,7 +163,7 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_address"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_address"
+    target_table: "cst_customer_address_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -179,7 +179,7 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_address_type_def"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_address_type_def"
+    target_table: "cst_customer_address_type_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -195,7 +195,7 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_comm_type_def"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_comm_type_def"
+    target_table: "cst_customer_comm_type_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -211,7 +211,7 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_communication"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_communication"
+    target_table: "cst_customer_communication_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -227,7 +227,7 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_disabled_type_def"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_disabled_type_def"
+    target_table: "cst_customer_disabled_type_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -243,7 +243,7 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_graduation_type_def"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_graduation_type_def"
+    target_table: "cst_customer_graduation_type_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -259,7 +259,7 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_group_def"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_group_def"
+    target_table: "cst_customer_group_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -275,7 +275,7 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_identity"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_identity"
+    target_table: "cst_customer_identity_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""

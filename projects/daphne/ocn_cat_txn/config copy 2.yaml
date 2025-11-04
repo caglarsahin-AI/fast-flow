@@ -1,0 +1,28 @@
+source_db_var: "daphne"
+target_db_var: "dwh"
+
+etl_tasks:
+  - source_schema: "ocn_cat_txn"
+    source_table: "cat_case_log"
+    target_schema: "ocn_cat_txn"
+    target_table: "cat_case_log"
+    load_method: "incremental_by_max_date"      
+    date_column: "system_date"             
+    dedupe_daily: false               
+    multiprocess: false
+
+  - source_schema: "ocn_cat_txn"
+    source_table: "cat_trnx_log_processing"
+    target_schema: "ocn_cat_txn"
+    target_table: "cat_trnx_log_processing"
+    load_method: "dates_by_day"
+    date_column: "system_date"
+    unique_key_column: "txn_guid"       # ← artan/tekil bir kolon (örnek)
+    keyset_page_size: 330000      # ← 100k–300k arası deneyip ayarlayabilirsin
+    date_start: "20250103"
+    date_end:   "20250201"
+    dedupe_daily: false
+    multiprocess: false           # istersen true + worker_count ile günleri paralel de çalışır
+
+
+    #message histoyr data yok, log processing BANLI!

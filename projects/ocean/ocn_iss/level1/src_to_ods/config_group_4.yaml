@@ -9,14 +9,14 @@ etl_tasks:
     source_type: table
     source_table: "txn_fee_det"
     target_schema: "dwh_ods"
-    target_table: "txn_fee_det"
+    target_table: "txn_fee_det_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -25,14 +25,14 @@ etl_tasks:
     source_type: table
     source_table: "txn_fin_adj"
     target_schema: "dwh_ods"
-    target_table: "txn_fin_adj"
+    target_table: "txn_fin_adj_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -42,14 +42,14 @@ etl_tasks:
     source_type: table
     source_table: "txn_install"
     target_schema: "dwh_ods"
-    target_table: "txn_install"
+    target_table: "txn_install_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -58,14 +58,14 @@ etl_tasks:
     source_type: table
     source_table: "txn_install_onl"
     target_schema: "dwh_ods"
-    target_table: "txn_install_onl"
+    target_table: "txn_install_onl_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -76,14 +76,14 @@ etl_tasks:
     source_type: table
     source_table: "txn_issuer_banking"
     target_schema: "dwh_ods"
-    target_table: "txn_issuer_banking"
+    target_table: "txn_issuer_banking_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -92,14 +92,14 @@ etl_tasks:
     source_type: table
     source_table: "txn_issuer_ext"
     target_schema: "dwh_ods"
-    target_table: "txn_issuer_ext"
+    target_table: "txn_issuer_ext_1"
     load_method: "drop_if_exists_and_create"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -108,14 +108,14 @@ etl_tasks:
     source_type: table
     source_table: "txn_issuer_install"
     target_schema: "dwh_ods"
-    target_table: "txn_issuer_install"
+    target_table: "txn_issuer_install_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -124,14 +124,14 @@ etl_tasks:
     source_type: table
     source_table: "txn_issuer_loyalty"
     target_schema: "dwh_ods"
-    target_table: "txn_issuer_loyalty"
+    target_table: "txn_issuer_loyalty_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
       
@@ -141,7 +141,7 @@ etl_tasks:
     source_type: table
     source_table: "txn_issuer_onl"
     target_schema: "dwh_ods"
-    target_table: "txn_issuer_onl"
+    target_table: "txn_issuer_onl_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
@@ -149,7 +149,7 @@ etl_tasks:
 
     passthrough_full: true
     passthrough_format: "binary"        # sadece bilgi amaçlı; kod binary kullanıyor
-    passthrough_spool_max_mb: 2048      # büyük batch'ler için buffer eşiği
+    pipe_queue_max: 32      # büyük batch'ler için buffer eşiği
     batch_size: 100000
 
     partitioning:
@@ -163,14 +163,14 @@ etl_tasks:
     source_type: table
     source_table: "txn_issuer_profile_info"
     target_schema: "dwh_ods"
-    target_table: "txn_issuer_profile_info"
+    target_table: "txn_issuer_profile_info_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -181,14 +181,14 @@ etl_tasks:
     source_type: table
     source_table: "txn_limit_restriction_def"
     target_schema: "dwh_ods"
-    target_table: "txn_limit_restriction_def"
+    target_table: "txn_limit_restriction_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -197,13 +197,13 @@ etl_tasks:
     source_type: table
     source_table: "txn_limit_restriction_det"
     target_schema: "dwh_ods"
-    target_table: "txn_limit_restriction_det"
+    target_table: "txn_limit_restriction_det_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false

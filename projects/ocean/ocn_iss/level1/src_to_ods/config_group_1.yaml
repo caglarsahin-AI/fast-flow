@@ -7,16 +7,16 @@ etl_tasks:
     source_type: table
     source_table:  "crd_card"
     target_schema: "dwh_ods"
-    target_table:  "crd_card"
-    load_method: "create_if_not_exists_or_truncate"
+    target_table:  "crd_card_1"
+    load_method: "drop_if_exists_and_create"
 
     where: ""         # push-down filtre (opsiyonel)
     order_by: ""      # push-down sıralama (opsiyonel)
 
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"        # sadece bilgi amaçlı; kod binary kullanıyor
-    passthrough_spool_max_mb: 2048      # büyük batch'ler için buffer eşiği
-    batch_size: 40000
+    pipe_queue_max: 32        # (opsiyonel) backpressure hassasiyeti
+    batch_size: 10000
 
     partitioning:
       enabled: true
@@ -30,7 +30,7 @@ etl_tasks:
     source_type: table
     source_table:  "crd_account"
     target_schema: "dwh_ods"
-    target_table:  "crd_account"
+    target_table:  "crd_account_1"
     load_method: "drop_if_exists_and_create" #"truncate_table" #"create_if_not_exists_or_truncate" #     load_method: "full_stream"
 
     # isteğe bağlı global filtre/sıralama
@@ -38,22 +38,22 @@ etl_tasks:
     order_by: ""              # örn: last_updated ASC, guid
 
     # (opsiyonel) streaming ayarları 
-    use_stream: false
+    #use_stream: false
     #batch_size: 40000    # partition kullanıldığında gerek olmayabilir
     #commit_every: 120000 # partition kullanıldığında gerek olmayabilir
     
     # FULL STREAM PASSTHROUGH
     passthrough_full: true
-    passthrough_format: "binary"      # "csv" veya "binary"
-    passthrough_spool_max_mb: 2048    # edge-case büyük batch’lerde buffer
-    batch_size: 40000 
+    #passthrough_format: "binary"      # "csv" veya "binary"
+    pipe_queue_max: 32
+    batch_size: 10000 
     
     # Partition stratejisi (seçeneklerden biri):
     partitioning:
-      enabled: false
-    #   column: "mbr_id"  
-    #   mode: "percentile"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
-    #   parts: 2           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      enabled: True
+      column: "mbr_id"  
+      mode: "percentile"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      parts: 8           # hash/auto/percentile için  (max işlemci sayıs kadar )
 
     # Alternatif:
     # partitioning:
@@ -69,7 +69,7 @@ etl_tasks:
     source_type: table
     source_table:  "crd_account_limit"
     target_schema: "dwh_ods"
-    target_table:  "crd_account_limit"
+    target_table:  "crd_account_limit_1"
     load_method: "create_if_not_exists_or_truncate" #"truncate_table" #"create_if_not_exists_or_truncate" #     load_method: "full_stream"
 
     # isteğe bağlı global filtre/sıralama
@@ -77,22 +77,22 @@ etl_tasks:
     order_by: ""              # örn: last_updated ASC, guid
 
     # (opsiyonel) streaming ayarları 
-    use_stream: false
+    #use_stream: false
     #batch_size: 100000    # partition kullanıldığında gerek olmayabilir
     #commit_every: 120000 # partition kullanıldığında gerek olmayabilir
     
     # FULL STREAM PASSTHROUGH
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"      # "csv" veya "binary"
-    passthrough_spool_max_mb: 2048   # edge-case büyük batch’lerde buffer
-    batch_size: 100000
+    pipe_queue_max: 32
+    batch_size: 10000
     
     # Partition stratejisi (seçeneklerden biri):
     partitioning:
       enabled: true
-      column: "guid"  
+      column: "account_no"  
       mode: "percentile"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
-      parts: 2           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      parts: 8           # hash/auto/percentile için  (max işlemci sayıs kadar )
       #distinct_limit: 16  # distinct e açırı yüklemeleri engeller 
 
     # Alternatif:
@@ -117,14 +117,14 @@ etl_tasks:
     source_type: table
     source_table: "cmp_install_txn_order"
     target_schema: "dwh_ods"
-    target_table: "cmp_install_txn_order"
+    target_table: "cmp_install_txn_order_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -133,14 +133,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_account_communication"
     target_schema: "dwh_ods"
-    target_table: "crd_account_communication"
+    target_table: "crd_account_communication_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -149,14 +149,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_account_limit_ext"
     target_schema: "dwh_ods"
-    target_table: "crd_account_limit_ext"
+    target_table: "crd_account_limit_ext_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -165,14 +165,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_account_limit_rest"
     target_schema: "dwh_ods"
-    target_table: "crd_account_limit_rest"
+    target_table: "crd_account_limit_rest_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -181,14 +181,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_account_limit_rest_used"
     target_schema: "dwh_ods"
-    target_table: "crd_account_limit_rest_used"
+    target_table: "crd_account_limit_rest_used_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -197,14 +197,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_account_limit_used"
     target_schema: "dwh_ods"
-    target_table: "crd_account_limit_used"
+    target_table: "crd_account_limit_used_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -213,14 +213,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_account_point"
     target_schema: "dwh_ods"
-    target_table: "crd_account_point"
+    target_table: "crd_account_point_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -229,14 +229,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_account_point_cmp"
     target_schema: "dwh_ods"
-    target_table: "crd_account_point_cmp"
+    target_table: "crd_account_point_cmp_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -246,15 +246,15 @@ etl_tasks:
     source_type: table
     source_table: "crd_card_account"
     target_schema: "dwh_ods"
-    target_table: "crd_card_account"
+    target_table: "crd_card_account_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
-    batch_size: 100000
+    pipe_queue_max: 32
+    batch_size: 10000
     partitioning:
       enabled: true
       column: "mbr_id"  
@@ -267,35 +267,43 @@ etl_tasks:
     source_type: table
     source_table: "crd_card_account_balance"
     target_schema: "dwh_ods"
-    target_table: "crd_card_account_balance"
+    target_table: "crd_card_account_balance_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
-    passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    #passthrough_format: "binary"
+    pipe_queue_max: 32
+    batch_size: 10000
+
+        # Partition stratejisi (seçeneklerden biri):
     partitioning:
-      enabled: false
+      enabled: True
+      column: "account_no"  
+      mode: "auto"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
+      parts: 8           # hash/auto/percentile için  (max işlemci sayıs kadar )
+
 
     ################################################################### target_table: "crd_card_auth"
   - source_schema: "ocn_iss"
     source_type: table
     source_table: "crd_card_auth"
     target_schema: "dwh_ods"
-    target_table: "crd_card_auth"
+    target_table: "crd_card_auth_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
+    batch_size: 10000
     partitioning:
       enabled: true
       column: "card_guid"  
       mode: "auto"   # auto | explicit(min max aralık) | distinct(tekil, gün gün aktarım için en iyisi) | hash_mod | percentile (otomatik between)
-      parts: 4           # hash/auto/percentile için  (max işlemci sayıs kadar )
+      parts: 4       # hash/auto/percentile için  (max işlemci sayıs kadar )
       #distinct_limit: 16  # distinct e açırı yüklemeleri engeller 
 
     ################################################################### target_table: "crd_card_batch_application"
@@ -303,14 +311,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_card_batch_application"
     target_schema: "dwh_ods"
-    target_table: "crd_card_batch_application"
+    target_table: "crd_card_batch_application_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -321,14 +329,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_card_fee"
     target_schema: "dwh_ods"
-    target_table: "crd_card_fee"
-    load_method: "create_if_not_exists_or_truncate"
+    target_table: "crd_card_fee_1"
+    load_method: "drop_if_exists_and_create"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -337,14 +345,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_card_fee_trail"
     target_schema: "dwh_ods"
-    target_table: "crd_card_fee_trail"
+    target_table: "crd_card_fee_trail_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -353,14 +361,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_card_last_activity"
     target_schema: "dwh_ods"
-    target_table: "crd_card_last_activity"
+    target_table: "crd_card_last_activity_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
-    passthrough_full: false
+    passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: true
       column: "card_guid"  
@@ -373,14 +381,14 @@ etl_tasks:
     source_type: table
     source_table: "crd_card_level_def"
     target_schema: "dwh_ods"
-    target_table: "crd_card_level_def"
+    target_table: "crd_card_level_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -389,13 +397,13 @@ etl_tasks:
     source_type: table
     source_table: "crd_card_logo_def"
     target_schema: "dwh_ods"
-    target_table: "crd_card_logo_def"
+    target_table: "crd_card_logo_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false

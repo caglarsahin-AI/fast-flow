@@ -8,14 +8,14 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_profession_type_def"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_profession_type_def"
+    target_table: "cst_customer_profession_type_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -24,14 +24,14 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_risk_group_def"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_risk_group_def"
+    target_table: "cst_customer_risk_group_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -40,14 +40,14 @@ etl_tasks:
     source_type: table
     source_table: "cst_customer_type_def"
     target_schema: "dwh_ods"
-    target_table: "cst_customer_type_def"
+    target_table: "cst_customer_type_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -56,14 +56,14 @@ etl_tasks:
     source_type: table
     source_table: "cst_stat_def"
     target_schema: "dwh_ods"
-    target_table: "cst_stat_def"
+    target_table: "cst_stat_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -72,14 +72,14 @@ etl_tasks:
     source_type: table
     source_table: "dbt_bank_account"
     target_schema: "dwh_ods"
-    target_table: "dbt_bank_account"
+    target_table: "dbt_bank_account_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -88,14 +88,14 @@ etl_tasks:
     source_type: table
     source_table: "dbt_bank_account_type_def"
     target_schema: "dwh_ods"
-    target_table: "dbt_bank_account_type_def"
+    target_table: "dbt_bank_account_type_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -104,14 +104,14 @@ etl_tasks:
     source_type: table
     source_table: "emb_emboss_code_def"
     target_schema: "dwh_ods"
-    target_table: "emb_emboss_code_def"
+    target_table: "emb_emboss_code_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -120,14 +120,14 @@ etl_tasks:
     source_type: table
     source_table: "emb_request_history"
     target_schema: "dwh_ods"
-    target_table: "emb_request_history"
+    target_table: "emb_request_history_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -136,14 +136,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_account_stat"
     target_schema: "dwh_ods"
-    target_table: "stmt_account_stat"
+    target_table: "stmt_account_stat_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -152,14 +152,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_auto_payment"
     target_schema: "dwh_ods"
-    target_table: "stmt_auto_payment"
+    target_table: "stmt_auto_payment_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -168,14 +168,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_balance_detail"
     target_schema: "dwh_ods"
-    target_table: "stmt_balance_detail"
+    target_table: "stmt_balance_detail_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -184,14 +184,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_billing_cycle_def"
     target_schema: "dwh_ods"
-    target_table: "stmt_billing_cycle_def"
+    target_table: "stmt_billing_cycle_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -200,14 +200,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_bucket_sys_def"
     target_schema: "dwh_ods"
-    target_table: "stmt_bucket_sys_def"
+    target_table: "stmt_bucket_sys_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -216,14 +216,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_bucket_type_def"
     target_schema: "dwh_ods"
-    target_table: "stmt_bucket_type_def"
+    target_table: "stmt_bucket_type_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -232,14 +232,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_calc_details"
     target_schema: "dwh_ods"
-    target_table: "stmt_calc_details"
+    target_table: "stmt_calc_details_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -248,14 +248,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_crd_account_point"
     target_schema: "dwh_ods"
-    target_table: "stmt_crd_account_point"
+    target_table: "stmt_crd_account_point_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -264,14 +264,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_posting_model_def"
     target_schema: "dwh_ods"
-    target_table: "stmt_posting_model_def"
+    target_table: "stmt_posting_model_def_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -280,14 +280,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_shifting_hist"
     target_schema: "dwh_ods"
-    target_table: "stmt_shifting_hist"
+    target_table: "stmt_shifting_hist_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -296,14 +296,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_summary"
     target_schema: "dwh_ods"
-    target_table: "stmt_summary"
+    target_table: "stmt_summary_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -312,14 +312,14 @@ etl_tasks:
     source_type: table
     source_table: "stmt_summary_hist"
     target_schema: "dwh_ods"
-    target_table: "stmt_summary_hist"
+    target_table: "stmt_summary_hist_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false
 
@@ -328,13 +328,13 @@ etl_tasks:
     source_type: table
     source_table: "txn_collected_fin_adj"
     target_schema: "dwh_ods"
-    target_table: "txn_collected_fin_adj"
+    target_table: "txn_collected_fin_adj_1"
     load_method: "create_if_not_exists_or_truncate"
 
     where: ""
     order_by: ""
     passthrough_full: true
     passthrough_format: "binary"
-    passthrough_spool_max_mb: 2048
+    pipe_queue_max: 32
     partitioning:
       enabled: false

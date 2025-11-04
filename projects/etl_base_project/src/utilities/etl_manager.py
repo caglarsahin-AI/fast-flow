@@ -1,9 +1,10 @@
 #etl_manager
+
 from __future__ import annotations
 from datetime import datetime, timedelta, date
 from typing import Any, Dict, Optional, List, Tuple
 import pandas as pd
-import os
+import os, io, threading, queue
 from tempfile import SpooledTemporaryFile
 from airflow.models import Variable
 from projects.etl_base_project.src.utilities.dynamic_filters import resolve_where_with_bindings
@@ -17,6 +18,131 @@ from projects.etl_base_project.src.etl.load import Loader
 from projects.etl_base_project.src.utilities.column_mapping import (load_mapping_items, mapping_to_select_and_outcols, mapping_to_ddl_columns)
 
 
+class _QueueWriter(io.RawIOBase):
+    """COPY TO STDOUT → write(b) çağrılarını bounded Queue'ya yazar (backpressure sağlar)."""
+    def __init__(self, q: "queue.Queue[bytes]"):
+        self.q = q
+        self._closed = False
+
+    def writable(self) -> bool:
+        return True
+
+    def write(self, b: bytes) -> int:
+        if self._closed:
+            return 0
+        # bloklayıcı: kuyruk doluysa producer durur → kaynak DB yavaşlar
+        self.q.put(b)
+        return len(b)
+
+    def close(self):
+        if not self._closed:
+            self._closed = True
+            try:
+                self.q.put(None)  # EOF işareti
+            except Exception:
+                pass
+        super().close()
+
+
+class _QueueReader(io.RawIOBase):
+    """COPY FROM STDIN ← read(size) çağrılarında Queue'dan veri okur."""
+    def __init__(self, q: "queue.Queue[bytes]"):
+        self.q = q
+        self._buf = b""
+        self._eof = False
+
+    def readable(self) -> bool:
+        return True
+
+    def read(self, size: int = -1) -> bytes:
+        if self._eof:
+            return b""
+
+        # sınırsız okuma
+        if size is None or size < 0:
+            chunks = []
+            while True:
+                chunk = self.q.get()
+                if chunk is None:  # EOF
+                    self._eof = True
+                    break
+                chunks.append(chunk)
+            return b"".join(chunks)
+
+        # boyutlu okuma
+        out = io.BytesIO()
+
+        # önce eldeki tampon
+        if self._buf:
+            n = min(len(self._buf), size)
+            out.write(self._buf[:n])
+            self._buf = self._buf[n:]
+            size -= n
+
+        # gerekirse kuyruktan çek
+        while size > 0 and not self._eof:
+            chunk = self.q.get()
+            if chunk is None:
+                self._eof = True
+                break
+            if len(chunk) <= size:
+                out.write(chunk)
+                size -= len(chunk)
+            else:
+                out.write(chunk[:size])
+                self._buf = chunk[size:]
+                size = 0
+
+        return out.getvalue()
+    
+def _pipe_copy_select_to_target(
+    ex, ld,
+    *,
+    select_items,          # mapping select list (expr/alias) | None
+    columns,               # source column names (source mode) | None
+    out_cols,              # TARGET column list (COPY column order) -> her zaman DOLU
+    where, 
+    order_by,
+    fmt: str = "binary",
+    q_maxsize: int = 32,
+) -> None:
+    """
+    Kaynaktan COPY TO STDOUT → in-memory bounded Queue → hedefe COPY FROM STDIN.
+    - select_items: mapping modunda SELECT listesi (expr/alias)
+    - columns     : source modunda kaynak kolon isimleri
+    - out_cols    : Hedef COPY kolon sırası (DAİMA bununla yüklenir)
+
+    Not: backpressure için bounded queue kullanılır; producer yavaşlatılır.
+    """
+    q: "queue.Queue[bytes]" = queue.Queue(maxsize=q_maxsize)
+
+    writer = _QueueWriter(q)
+    reader = _QueueReader(q)
+
+    def _produce():
+        try:
+            ex.copy_select_to_filelike(
+                columns=columns,            # source modunda kullanılır
+                select_items=select_items,  # mapping modunda kullanılır
+                file_obj=writer,
+                where=where,
+                order_by=order_by,
+                fmt=fmt,                    # "binary" önerilir
+            )
+        finally:
+            try:
+                writer.close()
+            except Exception:
+                pass
+    
+                
+    t = threading.Thread(target=_produce, name="copy-producer", daemon=True)
+    t.start()
+    logger.info(f"[INFO 5 threading başla]")
+    # hedefe doğrudan akıt (DAİMA hedef kolonları ile)
+    ld.copy_from_filelike(file_obj=reader, columns=out_cols, fmt=fmt)
+    logger.info(f"[INFO 5 threading bitir]")    
+    t.join()
 
 def wait_for_debug():
     if os.getenv("ENABLE_DEBUG") == "1":
@@ -176,6 +302,39 @@ class ETLManager:
         self._run_full_stream(**kwargs)  # default
         logger.info("run_etl_task bitti")
 
+    """def _pipe_copy_binary(self, ex, ld, select_items, out_cols, where, order_by, fmt="binary"):
+         
+        Kaynaktan BINARY COPY TO STDOUT -> küçük RAM kuyruğu -> hedefe BINARY COPY FROM STDIN
+        Tek ara tampon: queue, maxsize ile bellek kontrol altında.
+         
+        assert fmt == "binary", "Pipe copy en verimlisi binary formatla çalışır"
+
+        q: "queue.Queue[bytes]" = queue.Queue(maxsize=32)  # ~32 * ~64KB = ~2MB civarı; gerekirse 64 yap
+        writer = _QueueWriter(q)
+        reader = _QueueReader(q)
+
+        # Kaynağı okuyan thread
+        def _produce():
+            try:
+                ex.copy_select_to_filelike(
+                    columns=None,
+                    select_items=select_items,
+                    file_obj=writer,         # psycopg2 write(data) çağıracak
+                    where=where,
+                    order_by=order_by,
+                    fmt="binary",
+                )
+            finally:
+                try: writer.close()
+                except Exception: pass
+
+        t = threading.Thread(target=_produce, name="copy-producer", daemon=True)
+        t.start()
+
+        # Tüketim: hedefe doğrudan yükle
+        ld.copy_from_filelike(file_obj=reader, columns=out_cols, fmt="binary")
+        t.join()  # tamamlanmasını bekle
+    """
     # ---- prepare only ----
     def _prepare_only(self, **kwargs) -> None:
         mode = (kwargs.get("column_mapping_mode") or "source").lower()
@@ -314,8 +473,8 @@ class ETLManager:
     # ---- full_stream (resolved where push-down) ----
     def _run_full_stream(self, **kwargs) -> None:
         passthrough_full = bool(kwargs.get("passthrough_full", True))
+        partitioning     = bool(kwargs.get("partitioning", True))
         passthrough_fmt  = (kwargs.get("passthrough_format") or "binary").lower()
-        spool_mb         = int(kwargs.get("passthrough_spool_max_mb", 512))
 
         #wait_for_debug() 
 
@@ -325,7 +484,6 @@ class ETLManager:
         source_type    = (kwargs.get("source_type") or "table").lower()
         column_mapping_mode = (kwargs.get("column_mapping_mode") or "source").lower()
         sql_text = (kwargs.get("sql_text") or "").strip()
-        #logger.info("_run_full_stream sql_text= %s", sql_text.strip())
         
 
         with DatabaseConnection(**self.source_db_config) as src_conn, \
@@ -365,18 +523,17 @@ class ETLManager:
                 ld.prepare(pd.DataFrame(columns=out_cols))
 
                 if passthrough_full:
-                    from tempfile import SpooledTemporaryFile
-                    with SpooledTemporaryFile(max_size=spool_mb * 1024 * 1024, mode="w+b") as buf:
-                        ex.copy_select_to_filelike(
-                            columns=None,
-                            select_items=select_items,
-                            file_obj=buf,
-                            where=resolved_where,
-                            order_by=order_by,
-                            fmt=passthrough_fmt,
-                        )
-                        buf.seek(0)
-                        ld.copy_from_filelike(file_obj=buf, columns=out_cols, fmt=passthrough_fmt)
+                    _pipe_copy_select_to_target(
+                        ex, ld,
+                        select_items=select_items,   # mapping sırası (expr/alias listesi)
+                        columns=None,                # source kolonu KULLANILMIYOR
+                        out_cols=out_cols,           # hedef COPY kolon sırası (mapping'ten)
+                        where=resolved_where,
+                        order_by=order_by,
+                        fmt=passthrough_fmt,
+                        q_maxsize=int(kwargs.get("pipe_queue_max", 32)),
+                    )
+                    logger.info(f"[INFO 1] source_type= {source_type} column_mapping_mode={column_mapping_mode} passthrough_full={passthrough_full}  partitioning={partitioning}")
                     return
 
                 # fallback
@@ -404,6 +561,7 @@ class ETLManager:
                         continue
                     ld.run(df); rows_loaded += len(df)
                 tgt_conn.commit()
+                logger.info(f"[INFO 2] source_type= {source_type} column_mapping_mode={column_mapping_mode} passthrough_full={passthrough_full}  partitioning={partitioning}")
                 return
             
             elif source_type == "table" and column_mapping_mode=="mapping_file":
@@ -418,18 +576,17 @@ class ETLManager:
                 ld.prepare(pd.DataFrame(columns=out_cols))
 
                 if passthrough_full:
-                    from tempfile import SpooledTemporaryFile
-                    with SpooledTemporaryFile(max_size=spool_mb * 1024 * 1024, mode="w+b") as buf:
-                        ex.copy_select_to_filelike(
-                            columns=None,
-                            select_items=select_items,
-                            file_obj=buf,
-                            where=resolved_where,
-                            order_by=order_by,
-                            fmt=passthrough_fmt,
-                        )
-                        buf.seek(0)
-                        ld.copy_from_filelike(file_obj=buf, columns=out_cols, fmt=passthrough_fmt)
+                    _pipe_copy_select_to_target(
+                        ex, ld,
+                        select_items=select_items,
+                        columns=None,
+                        out_cols=out_cols,
+                        where=resolved_where,
+                        order_by=order_by,
+                        fmt=passthrough_fmt,
+                        q_maxsize=int(kwargs.get("pipe_queue_max", 32)),
+                    )
+                    logger.info(f"[INFO 3] source_type= {source_type} column_mapping_mode={column_mapping_mode}  passthrough_full={passthrough_full}  partitioning={partitioning}")
                     return
 
                 # fallback
@@ -444,6 +601,7 @@ class ETLManager:
                         continue
                     ld.run(df); rows_loaded += len(df)
                 tgt_conn.commit()
+                logger.info(f"[INFO 4] source_type= {source_type} column_mapping_mode={column_mapping_mode} passthrough_full={passthrough_full}  partitioning={partitioning}")
                 return
 
             elif source_type == "table" and column_mapping_mode=="source":
@@ -456,18 +614,19 @@ class ETLManager:
                 ld.prepare(pd.DataFrame(columns=cols))  # mevcut Loader.prepare DDL’i/Truncate’ı yönetir
 
                 if passthrough_full:
-                    from tempfile import SpooledTemporaryFile
-                    with SpooledTemporaryFile(max_size=spool_mb * 1024 * 1024, mode="w+b") as buf:
-                        ex.copy_select_to_filelike(
-                            columns=cols,
-                            select_items=None,
-                            file_obj=buf,
-                            where=resolved_where,
-                            order_by=order_by,
-                            fmt=passthrough_fmt,
-                        )
-                        buf.seek(0)
-                        ld.copy_from_filelike(file_obj=buf, columns=cols, fmt=passthrough_fmt)
+                    logger.info(f"[INFO 5 başla] source_type= {source_type} column_mapping_mode={column_mapping_mode} passthrough_full={passthrough_full} partitioning={partitioning}")
+                   
+                    _pipe_copy_select_to_target(
+                        ex, ld,
+                        select_items=None,   # mapping yok
+                        columns=cols,        # kaynağın kolon sırası ile seç
+                        out_cols=cols,       # hedef COPY kolon sırası = kaynak kolonlar
+                        where=resolved_where,
+                        order_by=order_by,
+                        fmt=passthrough_fmt,
+                        q_maxsize=int(kwargs.get("pipe_queue_max", 32)),
+                    )
+                    logger.info(f"[INFO 5 bitir] source_type= {source_type} column_mapping_mode={column_mapping_mode} passthrough_full={passthrough_full} partitioning={partitioning}")
                     return
 
                 # fallback (eski stream → df → load)
@@ -482,6 +641,7 @@ class ETLManager:
                         continue
                     ld.run(df); rows_loaded += len(df)
                 tgt_conn.commit()
+                logger.info(f"[INFO 6] source_type= {source_type} column_mapping_mode={column_mapping_mode}  partitioning={partitioning}")
                 return
 
             elif source_type=="csv":
